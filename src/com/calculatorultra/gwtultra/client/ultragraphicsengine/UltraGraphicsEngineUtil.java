@@ -31,11 +31,12 @@ public class UltraGraphicsEngineUtil {
 	public static final String STYLE_GREY_SMALL_CURSOR = "greySmallCursor";
 	public static final String STYLE_GREY_MEDIUM_CURSOR = "greyMediumCursor";
 	public static final String STYLE_GREY_LARGE_CURSOR = "greyLargeCursor";
+	public static final String STYLE_OPACITY_40 = "imageOpacity";
 	
 	public static final String PLAYER = "images/player.png";
 	public static final String TARGET = "images/target.png";
 	public static final String OBSTICLE = "images/obsticle.png";
-	public static final String BACKGROUND = "images/background.png";
+	public static final String BACKGROUND = "images/background.jpg";
 	public static final String HUNTER = "images/hunter.png";
 	public static final String TONEY_IS_ANGRY = "images/toneyIsAngry.png";
 	public static final String RESET_OVERLAY = "images/resetOverlay.png";
@@ -48,6 +49,12 @@ public class UltraGraphicsEngineUtil {
 	public static Image createImageWithClickHandler(String imageResource, ClickHandler clickHandler) {
 		Image image = new Image(imageResource);
 		image.addClickHandler(clickHandler);
+		return image;
+	}
+	
+	public static Image createImageWithStyle(String imageResource, String style) {
+		Image image = new Image(imageResource);
+		image.setStyleName(style);
 		return image;
 	}
 	

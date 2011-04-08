@@ -112,3 +112,8 @@
 	font-family: ‘Lucida Console’, Monaco, monospace;
 	font-weight: bold;
 }
+
+.imageOpacity {
+  opacity:0.4;
+  filter:alpha(opacity=40);
+}

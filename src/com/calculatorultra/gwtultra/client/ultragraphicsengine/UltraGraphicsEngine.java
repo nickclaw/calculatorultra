@@ -36,9 +36,11 @@ import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraph
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_BOLD;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_LARGE_CURSOR;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_MEDIUM;
+import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_OPACITY_40;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.TARGET;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.TONEY_IS_ANGRY;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createImageWithClickHandler;
+import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createImageWithStyle;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createLabelWithStyle;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createLabelWithStyleChangeAndClickHandler;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.setTextAndStyle;
@@ -107,7 +109,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 	private final Vector remainingTargetMovesValueLabelPosition = new Vector(837, BOTTOM_ROW_Y);
 	private final GraphicsObject<Label> remainingTargetMovesValueLabel = new GraphicsObject<Label> (createLabelWithStyle("0000", STYLE_BLUE_SMALL), remainingTargetMovesValueLabelPosition);
 	private final GraphicsObject<Image> resetImage = new GraphicsObject<Image> (createImageWithClickHandler(RESET_OVERLAY, this), new Vector(FIELD_OFFSET_X, FIELD_OFFSET_Y));
-	private final GraphicsObject<Image> background = new GraphicsObject<Image> (new Image(BACKGROUND), new Vector(0, 0));
+	private final GraphicsObject<Image> background = new GraphicsObject<Image> (createImageWithStyle(BACKGROUND, STYLE_OPACITY_40), new Vector(0, 0));
 	private GraphicsObject<Image> hitCounter;
 	private final Vector signInLabelPosition = new Vector(82, MIDDLE_ROW_Y);
 	private final GraphicsObject<Label> signInLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Sign In", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), signInLabelPosition);
@@ -261,7 +263,9 @@ public class UltraGraphicsEngine implements ClickHandler {
 		GWT.log("paint");
 		Context2d context = canvas.getWidget().getContext2d();
 		
+		context.setGlobalAlpha(.4);
 		context.drawImage(((ImageElement) (background.getWidget()).getElement().cast()), background.getXPosition(), background.getYPosition());
+		
 		
 		for(FieldObject object : fieldObjects) {
 			if (((object.getPosition().x) < 0)
