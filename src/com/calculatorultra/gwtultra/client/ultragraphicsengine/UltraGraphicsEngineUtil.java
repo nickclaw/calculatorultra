@@ -35,7 +35,7 @@ public class UltraGraphicsEngineUtil {
 	public static final String PLAYER = "images/player.png";
 	public static final String TARGET = "images/target.png";
 	public static final String OBSTICLE = "images/obsticle.png";
-	public static final String BACKGROUND = "images/background.jpg";
+	public static final String BACKGROUND = "images/background.png";
 	public static final String HUNTER = "images/hunter.png";
 	public static final String TONEY_IS_ANGRY = "images/toneyIsAngry.png";
 	public static final String RESET_OVERLAY = "images/resetOverlay.png";

@@ -3,12 +3,12 @@ package com.calculatorultra.gwtultra.server;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.calculatorultra.gwtultra.client.UltraService;
 import com.calculatorultra.gwtultra.shared.HumanPlayer;
-import com.google.gwt.dev.util.collect.HashMap;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 public class UltraServiceImpl extends RemoteServiceServlet implements UltraService {

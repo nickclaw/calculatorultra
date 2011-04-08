@@ -44,12 +44,17 @@ import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraph
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.setTextAndStyle;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.calculatorultra.gwtultra.client.FieldObject;
 import com.calculatorultra.gwtultra.client.GraphicsObject;
 import com.calculatorultra.gwtultra.client.GwtUltra;
+import com.calculatorultra.gwtultra.client.Hunter;
+import com.calculatorultra.gwtultra.client.Obstacle;
+import com.calculatorultra.gwtultra.client.Player;
+import com.calculatorultra.gwtultra.client.Target;
 import com.calculatorultra.gwtultra.client.Vector;
 import com.calculatorultra.gwtultra.shared.HumanPlayer;
 import com.google.gwt.canvas.client.Canvas;
@@ -75,7 +80,7 @@ import com.google.gwt.user.client.ui.TextBox;
 
 public class UltraGraphicsEngine implements ClickHandler {
 	
-	private final Canvas canvas = Canvas.createIfSupported();
+	private final GraphicsObject<Canvas> canvas = new GraphicsObject<Canvas>(Canvas.createIfSupported(), new Vector(0,0));
 	Vector position = new Vector(10,10);
 	static final int canvasHeight = 700;
 	static final int canvasWidth = 1000;
@@ -111,7 +116,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 	private final FocusPanel focusPanel = new FocusPanel();
 	private final AbsolutePanel absPanel = new AbsolutePanel();
 	private final  GwtUltra gwtUltra;
-	private final ArrayList<GraphicsObject> graphicsObjects = new ArrayList<GraphicsObject>();
+	private final ArrayList<GraphicsObject<?>> graphicsObjects = new ArrayList<GraphicsObject<?>>();
 	private final ArrayList<FieldObject> fieldObjects = new ArrayList<FieldObject>();
 	private final Vector signInDialogBoxPosition = new Vector(70, 323);
 	private final SignInDialogBox signInDialogBox = new SignInDialogBox(this, signInDialogBoxPosition);
@@ -131,12 +136,12 @@ public class UltraGraphicsEngine implements ClickHandler {
 
 	public void setupGame() {
 		
-        canvas.setStyleName("mainCanvas");
-        canvas.setWidth(canvasWidth + "px");
-        canvas.setCoordinateSpaceWidth(canvasWidth);
-        canvas.setHeight(canvasHeight + "px");
-        canvas.setCoordinateSpaceHeight(canvasHeight);        
-		context = canvas.getContext2d();
+        canvas.getWidget().setStyleName("mainCanvas");
+        canvas.getWidget().setWidth(canvasWidth + "px");
+        canvas.getWidget().setCoordinateSpaceWidth(canvasWidth);
+        canvas.getWidget().setHeight(canvasHeight + "px");
+        canvas.getWidget().setCoordinateSpaceHeight(canvasHeight);        
+		context = canvas.getWidget().getContext2d();
 		
 		
 		RootPanel rootPanel = RootPanel.get();
@@ -182,7 +187,8 @@ public class UltraGraphicsEngine implements ClickHandler {
 		rootPanel.add(focusPanel);
 		
 		//Add all the GraphicsObjects to the ArrayList
-		graphicsObjects.add(background);
+		//graphicsObjects.add(background);
+		graphicsObjects.add(canvas);
 		graphicsObjects.add(scoreLabel);
 		graphicsObjects.add(highScoreLabel);
 		graphicsObjects.add(averagePointsLabel);
@@ -210,37 +216,38 @@ public class UltraGraphicsEngine implements ClickHandler {
 
 	public void resetField() {
 		absPanel.clear();
-		for (GraphicsObject object : graphicsObjects) {
+		for (GraphicsObject<?> object : graphicsObjects) {
 			addToAbsPanel(object);
 		}
 		
 		setFocus(true);
 		
 		fieldObjects.clear();
-		
+		canvas.getWidget().getContext2d().drawImage(((ImageElement) (background.getWidget()).getElement().cast()), background.getXPosition(), background.getYPosition());
 		repaint();
 		
 		
 	}
 
-	private void addToAbsPanel(GraphicsObject object) {
+	private void addToAbsPanel(GraphicsObject<?> object) {
 		absPanel.insert(object.getWidget(), object.getXPosition(), object.getYPosition(), graphicsObjects.indexOf(object));
 	}
 	
 	public void addToField(FieldObject object) {
-		GWT.log(object.getClass().getName());
-		final String filePath = "com.calculatorultra.gwtultra.client.";
-		if (object.getClass().getName().equals(filePath + "Hunter")) {
-			if (isToneysFace) {
-				object.setImage(new Image(TONEY_IS_ANGRY));
-			} else object.setImage(new Image(HUNTER));
-		} else if (object.getClass().getName().equals(filePath + "Player")) {
-			object.setImage(new Image(PLAYER));
-		} else if (object.getClass().getName().equals(filePath + "Obstacle")) {
-			object.setImage(new Image(OBSTICLE));
-		} else if (object.getClass().getName().equals(filePath + "Target")) {
-			object.setImage(new Image(TARGET));
+		Map<Class<?>, Image> classToImagesMap = new HashMap<Class<?>,Image>();
+		classToImagesMap.put(Hunter.class, new Image(HUNTER));
+		classToImagesMap.put(Player.class, new Image(PLAYER));
+		classToImagesMap.put(Obstacle.class, new Image(OBSTICLE));
+		classToImagesMap.put(Target.class, new Image(TARGET));
+		Image i = classToImagesMap.get(object.getClass());
+		if (i == null) {
+			throw new IllegalArgumentException(object + " does not have a class mapping in " + classToImagesMap);
 		}
+		object.setImage(i);
+		if (object.getClass().equals(Hunter.class) && isToneysFace) {
+			object.setImage(new Image(TONEY_IS_ANGRY));
+		}
+		
 		object.getImage().setVisible(false);
 		RootPanel.get().add(object.getImage());
 		fieldObjects.add(object);
@@ -252,7 +259,9 @@ public class UltraGraphicsEngine implements ClickHandler {
 
 	public void repaint() {
 		GWT.log("paint");
-		Context2d context = canvas.getContext2d();
+		Context2d context = canvas.getWidget().getContext2d();
+		
+		context.drawImage(((ImageElement) (background.getWidget()).getElement().cast()), background.getXPosition(), background.getYPosition());
 		
 		for(FieldObject object : fieldObjects) {
 			if (((object.getPosition().x) < 0)
@@ -265,9 +274,6 @@ public class UltraGraphicsEngine implements ClickHandler {
 				positionInPixels.x = object.getPosition().x * SPACE_WIDTH - ICON_OFFSET + FIELD_OFFSET_X;
 				positionInPixels.y = object.getPosition().y * SPACE_HEIGHT - ICON_OFFSET + FIELD_OFFSET_Y;
 				context.drawImage(((ImageElement) object.getImage().getElement().cast()), positionInPixels.x, positionInPixels.y);
-				GWT.log("drawing");
-				//object.getImage().setVisible(true);
-				//absPanel.insert(object.getImage(), positionInPixels.x, positionInPixels.y, graphicsObjects.size());
 			}
 		}
 		
@@ -275,27 +281,26 @@ public class UltraGraphicsEngine implements ClickHandler {
 
 	public void setScore(int score) {
 		String formattedText = NumberFormat.getFormat("0000").format(score);
-		((Label) scoreValueLabel.getWidget()).setText(formattedText);
+		scoreValueLabel.getWidget().setText(formattedText);
 
 	}
 
 	public void setHighScore(int highScore) {
 		GWT.log("new high score");
 		String formattedText = NumberFormat.getFormat("0000").format(highScore);
-		((Label) highScoreValueLabel.getWidget()).setText(formattedText);
+		highScoreValueLabel.getWidget().setText(formattedText);
 	}
 	
 	public void setRemainingTargetMoves(int targetMoves) {
-		GWT.log(new Integer(targetMoves).toString());
 		String formattedText = NumberFormat.getFormat("0000").format(targetMoves);
-		((Label) remainingTargetMovesValueLabel.getWidget()).setText(formattedText);
+		remainingTargetMovesValueLabel.getWidget().setText(formattedText);
 		
 	}
 
 	public void setAveragePoints(float averagePoints) {
 		String formattedAverageScore = NumberFormat.getFormat("00.0").format(
 				averagePoints);
-		((Label) averagePointsValueLabel.getWidget()).setText(formattedAverageScore);
+		averagePointsValueLabel.getWidget().setText(formattedAverageScore);
 	}
 	
 	public void gameOver() {
@@ -322,7 +327,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 	public void updateLeaderboards(List<HumanPlayer> normalHighScores,
 			List<HumanPlayer> wrappingHighScores,
 			List<HumanPlayer> chaseHighScores) {
-		FlexTable leaderboardsFlexTable = ((FlexTable) leaderboardsTable.getWidget());
+		FlexTable leaderboardsFlexTable = (leaderboardsTable.getWidget());
 		leaderboardsFlexTable.clear();
 		leaderboardsFlexTable.setStyleName("blueText");
 		leaderboardsFlexTable.getRowFormatter().setStyleName(0, "boldBlueText");
@@ -356,33 +361,6 @@ public class UltraGraphicsEngine implements ClickHandler {
 		
 		
 	}
-
-	/**
-	public void movePlayerAnnimated() {
-		GWT.log("move player");
-		Timer timer = new Timer() {
-			@Override
-			public void run() {
-				GWT.log("run");
-				if (annimationStepCounter <= ANNIMATION_STEPS) {
-					annimationStepCounter++;
-					field.remove(gwtUltra.player.icon);
-					field.add(gwtUltra.player.icon, gwtUltra.player.position.x
-							* SPACE_WIDTH + gwtUltra.player.direction.x
-							* PX_PER_STEP_HORIZONTAL - ICON_OFFSET,
-							gwtUltra.player.position.x * SPACE_WIDTH
-									+ gwtUltra.player.direction.x
-									* PX_PER_STEP_HORIZONTAL - ICON_OFFSET);
-				} else {
-					this.cancel();
-					gwtUltra.player.position.add(gwtUltra.player.direction);
-				}
-
-			}
-		};
-		timer.scheduleRepeating(gwtUltra.speed / ANNIMATION_STEPS);
-	}
-	**/
 	
 	public void setFocus(boolean setFocus) {
 		focusPanel.setFocus(setFocus);

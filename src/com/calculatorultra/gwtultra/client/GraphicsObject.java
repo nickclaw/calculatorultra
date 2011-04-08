@@ -2,15 +2,15 @@ package com.calculatorultra.gwtultra.client;
 
 import com.google.gwt.user.client.ui.Widget;
 
-public class GraphicsObject<T extends Widget> {
+public class GraphicsObject<TWidget extends Widget> {
 	private Vector position;
-	private T widget;
+	private TWidget widget;
 	
-	public Widget getWidget() {
+	public TWidget getWidget() {
 		return widget;
 	}
 	
-	public void setWidget(T widget) {
+	public void setWidget(TWidget widget) {
 		this.widget = widget;
 	}
 	
@@ -30,12 +30,12 @@ public class GraphicsObject<T extends Widget> {
 		return position.y;
 	}
 	
-	public GraphicsObject(T widget, Vector position) {
+	public GraphicsObject(TWidget widget, Vector position) {
 		this.widget = widget;
 		this.position = position;
 	}
 	
-	public GraphicsObject(T widget, int xPosition, int yPosition) {
+	public GraphicsObject(TWidget widget, int xPosition, int yPosition) {
 		this.widget = widget;
 		this.position = new Vector(xPosition, yPosition);
 	}

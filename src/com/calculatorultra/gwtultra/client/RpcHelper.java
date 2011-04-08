@@ -21,7 +21,7 @@ public class RpcHelper {
     	@Override
 		public void onFailure(Throwable caught) {
     		Window.alert("system failed");
-    		GWT.log("failure on server");
+    		GWT.log("failure on server", caught);
     	}
 
 		@Override

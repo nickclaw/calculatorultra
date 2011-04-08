@@ -315,10 +315,8 @@ public class GwtUltra implements EntryPoint {
 		if (humanPlayer != null) {
 			if (speed == HIGH_SPEED && !isRepeatingMode && !isWrappingMode && !isChaseMode) {
 				highScore = humanPlayer.getNormalHighScore();
-				graphics.setHighScore(highScore);
 			} else if (speed == HIGH_SPEED && !isRepeatingMode && isWrappingMode && !isChaseMode) {
 				highScore = humanPlayer.getWrappingHighScore();
-				graphics.setHighScore(highScore);
 			} else if (!isRepeatingMode && isChaseMode) {
 				highScore = humanPlayer.getChaseHighScore();
 			}
