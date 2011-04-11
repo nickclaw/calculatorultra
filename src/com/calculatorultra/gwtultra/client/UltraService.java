@@ -10,7 +10,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("ultraServer")
 public interface UltraService extends RemoteService {
 	
-	Map<String, List<HumanPlayer>> getTop10HighScores();
+	Map<String, List<HumanPlayer>> getScores();
 	
 	HumanPlayer registerPlayer(String name, String password);
 	

@@ -2,70 +2,86 @@ package com.calculatorultra.gwtultra.server;
 
 
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.calculatorultra.gwtultra.client.UltraService;
 import com.calculatorultra.gwtultra.shared.HumanPlayer;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 public class UltraServiceImpl extends RemoteServiceServlet implements UltraService {
-	HumanPlayer calvin = new HumanPlayer("Calvin", "test", 314, 300, 326);
-	HumanPlayer nick = new HumanPlayer("Nick", "test", 270, 200, 506);
-	HumanPlayer matt = new HumanPlayer("Matt", "test", 30, 5, 350);
-	HumanPlayer mitch = new HumanPlayer("Mitch", "test", 10, 10, 10);
-
 	private static final long serialVersionUID = 1L;
 	
-	
+	AwsSimpleDBConnector awsSimpleDB = null;
 
 	@Override
-	public Map<String, List<HumanPlayer>> getTop10HighScores() {
-		List<HumanPlayer> normalHighSores = new ArrayList<HumanPlayer>();
-		normalHighSores.add(calvin);
-		normalHighSores.add(nick);
-		normalHighSores.add(matt);
-		normalHighSores.add(mitch);
-		List<HumanPlayer> wrappingHighSores = new ArrayList<HumanPlayer>();
-		wrappingHighSores.add(calvin);
-		wrappingHighSores.add(nick);
-		wrappingHighSores.add(mitch);
-		wrappingHighSores.add(matt);
-		List<HumanPlayer> chaseHighSores = new ArrayList<HumanPlayer>();
-		chaseHighSores.add(nick);
-		chaseHighSores.add(matt);
-		chaseHighSores.add(calvin);
-		chaseHighSores.add(mitch);
+	public Map<String, List<HumanPlayer>> getScores() {
+		AwsSimpleDBConnector awsSimpleDB = createAwsConnector();
 		Map<String, List<HumanPlayer>> top10HighScores = new HashMap<String, List<HumanPlayer>>();
-		top10HighScores.put("normal", normalHighSores);
-		top10HighScores.put("wrapping", wrappingHighSores);
-		top10HighScores.put("chase", chaseHighSores);
-		return top10HighScores;
+		if (awsSimpleDB != null) {
+			List<HumanPlayer> normalHighScores = awsSimpleDB.getAllHumanPlayers();
+			Collections.sort(normalHighScores, new Comparator<HumanPlayer>() {
+				@Override
+				public int compare(HumanPlayer arg0, HumanPlayer arg1) {
+					return arg1.getNormalHighScore() - arg0.getNormalHighScore();
+				}
+			});
+			top10HighScores.put("normal", normalHighScores);
+			
+			List<HumanPlayer> wrappingHighScores = awsSimpleDB.getAllHumanPlayers();
+			Collections.sort(wrappingHighScores, new Comparator<HumanPlayer>() {
+				@Override
+				public int compare(HumanPlayer arg0, HumanPlayer arg1) {
+					return arg1.getWrappingHighScore() - arg0.getWrappingHighScore();
+				}
+			});
+			top10HighScores.put("wrapping", wrappingHighScores);
+			
+			List<HumanPlayer> chaseHighScores = awsSimpleDB.getAllHumanPlayers();
+			Collections.sort(chaseHighScores, new Comparator<HumanPlayer>() {
+				@Override
+				public int compare(HumanPlayer arg0, HumanPlayer arg1) {
+					return arg1.getChaseHighScore() - arg0.getChaseHighScore();
+				}
+			});
+			top10HighScores.put("chase", chaseHighScores);
+			return top10HighScores;
+		}
+		return null;
 	}
 
 	
 
 	@Override
 	public HumanPlayer registerPlayer(String name, String password) {
-		ArrayList<HumanPlayer> registeredPlayers = getRegisteredPlayers();
-		for (HumanPlayer registeredPlayer : registeredPlayers) {
-			if (registeredPlayer.getName().equals(name)) {
-				return new HumanPlayer(null, null);
+		AwsSimpleDBConnector awsSimpleDB = createAwsConnector();
+		if (awsSimpleDB != null) {
+			List<HumanPlayer> humanPlayers = awsSimpleDB.getPlayer(name);
+			if (humanPlayers.size() == 0) {
+				HumanPlayer humanPlayer = new HumanPlayer(name, password);
+				awsSimpleDB.registerPlayer(humanPlayer);
+				return humanPlayer;
 			}
 		}
-		registeredPlayers.add(new HumanPlayer(name, password));
-		return new HumanPlayer(name, password);
+		return new HumanPlayer(null, null);
 	}
 
 	@Override
 	public HumanPlayer signIn(String name, String password) {
-		ArrayList<HumanPlayer> registeredPlayers = getRegisteredPlayers();
-		for (HumanPlayer registeredPlayer : registeredPlayers) {
-			if (registeredPlayer.getName().equals(name)) {
-				if (registeredPlayer.getPassword().equals(password)) {
-					return registeredPlayer;
+		HumanPlayer humanPlayer;
+		AwsSimpleDBConnector awsSimpleDB = createAwsConnector();
+		if (awsSimpleDB != null) {
+			List<HumanPlayer> humanPlayers = awsSimpleDB.getPlayer(name);
+			if (humanPlayers.size() > 0) {
+				humanPlayer = awsSimpleDB.getPlayer(name).get(0);
+				if (humanPlayer.getPassword().equals(password)) {
+					return humanPlayer;
 				} else return new HumanPlayer(name, null);
 			}
 		}
@@ -74,23 +90,38 @@ public class UltraServiceImpl extends RemoteServiceServlet implements UltraServi
 
 	@Override
 	public void setNewHighScore(HumanPlayer humanPlayer) {
-		ArrayList<HumanPlayer> registeredPlayers = getRegisteredPlayers();
-		for (HumanPlayer registeredPlayer : registeredPlayers) {
-			if (registeredPlayer.getName().equals(humanPlayer.getName())) {
-				registeredPlayer.setNormalHighScore(humanPlayer.getNormalHighScore());
-				registeredPlayer.setWrappingHighScore(humanPlayer.getWrappingHighScore());
-				registeredPlayer.setChaseHighScore(humanPlayer.getChaseHighScore());
-			}
+		AwsSimpleDBConnector awsSimpleDB = createAwsConnector();
+		if (awsSimpleDB != null) {
+			awsSimpleDB.setHighScore(humanPlayer);
 		}
 	}
 	
-	private ArrayList<HumanPlayer> getRegisteredPlayers() {
-		ArrayList<HumanPlayer> registeredPlayers = new ArrayList<HumanPlayer>();
-		registeredPlayers.add(nick);
-		registeredPlayers.add(matt);
-		registeredPlayers.add(calvin);
-		registeredPlayers.add(mitch);
-		return registeredPlayers;
+	private AwsSimpleDBConnector createAwsConnector() {
+		if (awsSimpleDB == null) {
+			try {
+				awsSimpleDB = new AwsSimpleDBConnector();
+			} catch (AmazonServiceException ase) {
+	            System.out.println("Caught an AmazonServiceException, which means your request made it "
+	                    + "to Amazon SimpleDB, but was rejected with an error response for some reason.");
+	            System.out.println("Error Message:    " + ase.getMessage());
+	            System.out.println("HTTP Status Code: " + ase.getStatusCode());
+	            System.out.println("AWS Error Code:   " + ase.getErrorCode());
+	            System.out.println("Error Type:       " + ase.getErrorType());
+	            System.out.println("Request ID:       " + ase.getRequestId());
+	        } catch (AmazonClientException ace) {
+	            System.out.println("Caught an AmazonClientException, which means the client encountered "
+	                    + "a serious internal problem while trying to communicate with SimpleDB, "
+	                    + "such as not being able to access the network.");
+	            System.out.println("Error Message: " + ace.getMessage());
+	        } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} return awsSimpleDB;
+		
 	}
 
 }

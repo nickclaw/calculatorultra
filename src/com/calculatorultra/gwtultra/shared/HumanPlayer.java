@@ -5,9 +5,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class HumanPlayer implements IsSerializable{
 	private String name;
 	private String password;
-	private int normalHighScore = 0;
-	private int wrappingHighScore = 0;
-	private int chaseHighScore = 0;
+	private Integer normalHighScore = 0;
+	private Integer wrappingHighScore = 0;
+	private Integer chaseHighScore = 0;
 	
 	public HumanPlayer() {
 		
@@ -31,7 +31,7 @@ public class HumanPlayer implements IsSerializable{
 	}
 	
 	public String getNormalHighScoreString() {
-		return new Integer(normalHighScore).toString();
+		return normalHighScore.toString();
 	}
 
 	public void setNormalHighScore(int normalHighScore) {
@@ -43,7 +43,7 @@ public class HumanPlayer implements IsSerializable{
 	}
 	
 	public String getWrappingHighScoreString() {
-		return new Integer(wrappingHighScore).toString();
+		return wrappingHighScore.toString();
 	}
 
 	public void setWrappingHighScore(int wrappingHighScore) {
@@ -55,7 +55,7 @@ public class HumanPlayer implements IsSerializable{
 	}
 
 	public String getChaseHighScoreString() {
-		return new Integer(chaseHighScore).toString();
+		return chaseHighScore.toString();
 	}
 
 	public void setChaseHighScore(int chaseHighScore) {
@@ -72,5 +72,10 @@ public class HumanPlayer implements IsSerializable{
 
 	public String getPassword() {
 		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+		
 	}
 }

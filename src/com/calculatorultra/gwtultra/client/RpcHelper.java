@@ -27,7 +27,7 @@ public class RpcHelper {
 		@Override
 		public void onSuccess(Map<String, List<HumanPlayer>> top10HighScores) {
 			GWT.log("success on leaderboard server");
-			if (top10HighScores.size() == 3) rpcCaller.updateLeaderboards(top10HighScores.get("normal"), top10HighScores.get("wrapping"), top10HighScores.get("chase"));
+			rpcCaller.setTop10HighScores(top10HighScores);
 		}
     };
     
@@ -91,7 +91,7 @@ public class RpcHelper {
 
 	public void getTop10HighScores(GwtUltra gwtUltra) {
 		rpcCaller = gwtUltra;
-		service.getTop10HighScores(updateLeaderboardsCallback);	
+		service.getScores(updateLeaderboardsCallback);	
 	}
 	
 	

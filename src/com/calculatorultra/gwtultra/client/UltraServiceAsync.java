@@ -8,7 +8,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface UltraServiceAsync {
 
-	void getTop10HighScores(AsyncCallback<Map<String, List<HumanPlayer>>> callback);
+	void getScores(AsyncCallback<Map<String, List<HumanPlayer>>> callback);
 
 	void registerPlayer(String name, String password,
 			AsyncCallback<HumanPlayer> callback);

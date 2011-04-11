@@ -71,7 +71,6 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -115,6 +114,8 @@ public class UltraGraphicsEngine implements ClickHandler {
 	private final GraphicsObject<Label> signInLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Sign In", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), signInLabelPosition);
 	private final Vector modeLabelPosition = new Vector(398, MIDDLE_ROW_Y);
 	private final GraphicsObject<Label> modeLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Mode", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), modeLabelPosition);
+	private final Vector leaderboardLabelPosition = new Vector(190, MIDDLE_ROW_Y);
+	private final GraphicsObject<Label> leaderboardLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Stats", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), leaderboardLabelPosition);
 	private final FocusPanel focusPanel = new FocusPanel();
 	private final AbsolutePanel absPanel = new AbsolutePanel();
 	private final  GwtUltra gwtUltra;
@@ -124,10 +125,10 @@ public class UltraGraphicsEngine implements ClickHandler {
 	private final SignInDialogBox signInDialogBox = new SignInDialogBox(this, signInDialogBoxPosition);
 	private final Vector modeDialogBoxPosition = new Vector(370, 333);
 	private final ModeDialogBox modeDialogBox = new ModeDialogBox(this, modeDialogBoxPosition);
-	private final GraphicsObject<FlexTable> leaderboardsTable = new GraphicsObject<FlexTable> (new FlexTable(), 850, 40);
+	private final Vector leaderboardDialogBoxPosition = new Vector(70, 250);
+	private LeaderboardDialogBox leaderboardDialogBox;
 	private boolean isToneysFace = false;
 	//private final Label cursor = new Label("A");
-
 	public UltraGraphicsEngine(GwtUltra gwtUltra) {
 		this.gwtUltra = gwtUltra;
 	}
@@ -204,6 +205,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 			graphicsObjects.add(hitCounter);
 		}
 		graphicsObjects.add(signInLabel);
+		graphicsObjects.add(leaderboardLabel);
 		graphicsObjects.add(modeLabel);
 		
 		focusPanel.add(absPanel);
@@ -260,7 +262,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 	}
 
 	public void repaint() {
-		GWT.log("paint");
+		//GWT.log("paint");
 		Context2d context = canvas.getWidget().getContext2d();
 		
 		context.setGlobalAlpha(.4);
@@ -328,44 +330,6 @@ public class UltraGraphicsEngine implements ClickHandler {
 		gwtUltra.startNewRound();
 	}
 	
-	public void updateLeaderboards(List<HumanPlayer> normalHighScores,
-			List<HumanPlayer> wrappingHighScores,
-			List<HumanPlayer> chaseHighScores) {
-		FlexTable leaderboardsFlexTable = (leaderboardsTable.getWidget());
-		leaderboardsFlexTable.clear();
-		leaderboardsFlexTable.setStyleName("blueText");
-		leaderboardsFlexTable.getRowFormatter().setStyleName(0, "boldBlueText");
-		int NORMAL_COLUMN_NAME = 0;
-		int NORMAL_COLUMN_SCORE = 1;
-		int WRAPPING_COLUMN_NAME = 2;
-		int WRAPPING_COLUMN_SCORE = 3;
-		int CHASE_COLUMN_NAME = 4;
-		int CHASE_COLUMN_SCORE = 5;
-
-		//leaderboardsFlexTable.getFlexCellFormatter().setColSpan(0, NORMAL_COLUMN_NAME, 2);
-		leaderboardsFlexTable.setText(0, NORMAL_COLUMN_NAME, "Normal");
-		for (int i = 0; normalHighScores.size() > i; i++) {
-			leaderboardsFlexTable.setText(i + 1, NORMAL_COLUMN_NAME, normalHighScores.get(i).getName());
-			leaderboardsFlexTable.setText(i + 1, NORMAL_COLUMN_SCORE, normalHighScores.get(i).getNormalHighScoreString());
-		}
-		
-		//leaderboardsFlexTable.getFlexCellFormatter().setColSpan(0, WRAPPING_COLUMN_NAME, 2);
-		leaderboardsFlexTable.setText(0, WRAPPING_COLUMN_NAME, "Wrapping");
-		for (int i = 0; wrappingHighScores.size() > i; i++) {
-			leaderboardsFlexTable.setText(i + 1, WRAPPING_COLUMN_NAME, wrappingHighScores.get(i).getName());
-			leaderboardsFlexTable.setText(i + 1, WRAPPING_COLUMN_SCORE, wrappingHighScores.get(i).getWrappingHighScoreString());
-		}
-		
-		//leaderboardsFlexTable.getFlexCellFormatter().setColSpan(0, CHASE_COLUMN_NAME, 2);
-		leaderboardsFlexTable.setText(0, CHASE_COLUMN_NAME, "Chase");
-		for (int i = 0; chaseHighScores.size() > i; i++) {
-			leaderboardsFlexTable.setText(i + 1, CHASE_COLUMN_NAME, chaseHighScores.get(i).getName());
-			leaderboardsFlexTable.setText(i + 1, CHASE_COLUMN_SCORE, chaseHighScores.get(i).getChaseHighScoreString());
-		}
-		
-		
-	}
-	
 	public void setFocus(boolean setFocus) {
 		focusPanel.setFocus(setFocus);
 	}
@@ -380,7 +344,11 @@ public class UltraGraphicsEngine implements ClickHandler {
 			signInDialogBox.show();
 			
 		} else if (event.getSource() == modeLabel.getWidget()) {
-			modeDialogBox.show();
+			modeDialogBox.show();	
+			
+		} else if (event.getSource() == leaderboardLabel.getWidget()) {
+			leaderboardDialogBox = new LeaderboardDialogBox(this, leaderboardDialogBoxPosition, gwtUltra.getTop10HighScores(), gwtUltra.getHumanPlayer());
+			leaderboardDialogBox.show();
 		
 		} else if (event.getSource() == focusPanel) {
 			if ((event.getX() >= 708) && (event.getX() <= 730)
@@ -489,61 +457,62 @@ public class UltraGraphicsEngine implements ClickHandler {
 	
 	public static class LeaderboardDialogBox extends UltraGraphicsPopupPanel {
 		
-		Map<String, List<HumanPlayer>> top10HighScores;
-		HumanPlayer humanPlayer;
-		
 		public LeaderboardDialogBox(final UltraGraphicsEngine ultraGraphicsEngine, final Vector position, final Map<String, List<HumanPlayer>> top10HighScores, final HumanPlayer humanPlayer) {
 			super("Leaderboards", ultraGraphicsEngine, position);
-			this.top10HighScores = top10HighScores;
-			this.humanPlayer = humanPlayer;
 		}
 
 		@Override
 		void setUpFlexTable() {
-			int NORMAL_COLUMN_NAME = 0;
-			int NORMAL_COLUMN_SCORE = 1;
-			int WRAPPING_COLUMN_NAME = 2;
-			int WRAPPING_COLUMN_SCORE = 3;
-			int CHASE_COLUMN_NAME = 4;
-			int CHASE_COLUMN_SCORE = 5;
 			
-			List<HumanPlayer> normalHighScores = top10HighScores.get("normal");
-			List<HumanPlayer> wrappingHighScores = top10HighScores.get("wrapping");
-			List<HumanPlayer> chaseHighScores = top10HighScores.get("chase");
+			Map<String, List<HumanPlayer>> top10HighScores = ultraGraphicsEngine.getGwtUltra().getTop10HighScores();
+			HumanPlayer humanPlayer = ultraGraphicsEngine.getGwtUltra().getHumanPlayer();
 			
-			setTextAndStyle(flexTable, 1, NORMAL_COLUMN_NAME, "Normal", STYLE_GREY_BOLD);
-			for (int i = 0; normalHighScores.size() > i; i++) {
-				setTextAndStyle(flexTable, i + 2, NORMAL_COLUMN_NAME, normalHighScores.get(i).getName(), STYLE_GREY_MEDIUM);
-				setTextAndStyle(flexTable, i + 2, NORMAL_COLUMN_SCORE, normalHighScores.get(i).getNormalHighScoreString(), STYLE_GREY_MEDIUM);
+			if (humanPlayer == null) {
+				setTextAndStyle(flexTable, 1, 0, "Sign In to view Leaderboards", STYLE_GREY_BOLD);
+			} else if (top10HighScores != null) {
+				int NORMAL_COLUMN_NAME = 0;
+				int NORMAL_COLUMN_SCORE = 1;
+				int WRAPPING_COLUMN_NAME = 2;
+				int WRAPPING_COLUMN_SCORE = 3;
+				int CHASE_COLUMN_NAME = 4;
+				int CHASE_COLUMN_SCORE = 5;
+				
+				List<HumanPlayer> normalHighScores = top10HighScores.get("normal");
+				List<HumanPlayer> wrappingHighScores = top10HighScores.get("wrapping");
+				List<HumanPlayer> chaseHighScores = top10HighScores.get("chase");
+				
+				setTextAndStyle(flexTable, 1, NORMAL_COLUMN_NAME, "Normal", STYLE_GREY_BOLD);
+				for (int i = 0; normalHighScores.size() > i; i++) {
+					setTextAndStyle(flexTable, i + 2, NORMAL_COLUMN_NAME, normalHighScores.get(i).getName(), STYLE_GREY_MEDIUM);
+					setTextAndStyle(flexTable, i + 2, NORMAL_COLUMN_SCORE, normalHighScores.get(i).getNormalHighScoreString(), STYLE_GREY_MEDIUM);
+				}
+				
+				setTextAndStyle(flexTable, 1, WRAPPING_COLUMN_NAME, "Wrapping", STYLE_GREY_BOLD);
+				for (int i = 0; wrappingHighScores.size() > i; i++) {
+					setTextAndStyle(flexTable, i + 2, WRAPPING_COLUMN_NAME, wrappingHighScores.get(i).getName(), STYLE_GREY_MEDIUM);
+					setTextAndStyle(flexTable, i + 2, WRAPPING_COLUMN_SCORE, wrappingHighScores.get(i).getWrappingHighScoreString(), STYLE_GREY_MEDIUM);
+				}
+				
+				setTextAndStyle(flexTable, 1, CHASE_COLUMN_NAME, "Chase", STYLE_GREY_BOLD);
+				for (int i = 0; chaseHighScores.size() > i; i++) {
+					setTextAndStyle(flexTable, i + 2, CHASE_COLUMN_NAME, chaseHighScores.get(i).getName(), STYLE_GREY_MEDIUM);
+					setTextAndStyle(flexTable, i + 2, CHASE_COLUMN_SCORE, chaseHighScores.get(i).getChaseHighScoreString(), STYLE_GREY_MEDIUM);
+				}
+				
+				setTextAndStyle(flexTable, 12, 0, "Name", STYLE_GREY_BOLD);
+				setTextAndStyle(flexTable, 13, 0, humanPlayer.getName(), STYLE_GREY_MEDIUM);
+				setTextAndStyle(flexTable, 12, 1, "Normal", STYLE_GREY_BOLD);
+				setTextAndStyle(flexTable, 13, 1, humanPlayer.getNormalHighScoreString(), STYLE_GREY_MEDIUM);
+				setTextAndStyle(flexTable, 12, 2, "Wrapping", STYLE_GREY_BOLD);
+				setTextAndStyle(flexTable, 13, 2, humanPlayer.getWrappingHighScoreString(), STYLE_GREY_MEDIUM);
+				setTextAndStyle(flexTable, 12, 3, "Chase", STYLE_GREY_BOLD);
+				setTextAndStyle(flexTable, 13, 3, humanPlayer.getChaseHighScoreString(), STYLE_GREY_MEDIUM);
 			}
-			
-			setTextAndStyle(flexTable, 1, WRAPPING_COLUMN_NAME, "Wrapping", STYLE_GREY_BOLD);
-			for (int i = 0; wrappingHighScores.size() > i; i++) {
-				setTextAndStyle(flexTable, i + 2, WRAPPING_COLUMN_NAME, wrappingHighScores.get(i).getName(), STYLE_GREY_MEDIUM);
-				setTextAndStyle(flexTable, i + 2, WRAPPING_COLUMN_SCORE, wrappingHighScores.get(i).getWrappingHighScoreString(), STYLE_GREY_MEDIUM);
-			}
-			
-			setTextAndStyle(flexTable, 1, CHASE_COLUMN_NAME, "Chase", STYLE_GREY_BOLD);
-			for (int i = 0; chaseHighScores.size() > i; i++) {
-				setTextAndStyle(flexTable, i + 2, CHASE_COLUMN_NAME, chaseHighScores.get(i).getName(), STYLE_GREY_MEDIUM);
-				setTextAndStyle(flexTable, i + 2, CHASE_COLUMN_SCORE, chaseHighScores.get(i).getChaseHighScoreString(), STYLE_GREY_MEDIUM);
-			}
-			
-			setTextAndStyle(flexTable, 12, 0, "Name", STYLE_GREY_MEDIUM);
-			setTextAndStyle(flexTable, 13, 0, humanPlayer.getName(), STYLE_GREY_MEDIUM);
-			setTextAndStyle(flexTable, 12, 1, "Normal", STYLE_GREY_MEDIUM);
-			setTextAndStyle(flexTable, 13, 1, humanPlayer.getNormalHighScoreString(), STYLE_GREY_MEDIUM);
-			setTextAndStyle(flexTable, 12, 2, "Wrapping", STYLE_GREY_MEDIUM);
-			setTextAndStyle(flexTable, 13, 2, humanPlayer.getWrappingHighScoreString(), STYLE_GREY_MEDIUM);
-			setTextAndStyle(flexTable, 12, 3, "Chase", STYLE_GREY_MEDIUM);
-			setTextAndStyle(flexTable, 13, 3, humanPlayer.getChaseHighScoreString(), STYLE_GREY_MEDIUM);
-			
 		}
 
 		@Override
 		int numberOfColumns() {
-			// TODO Auto-generated method stub
-			return 0;
+			return 5;
 		}
 	}
 	

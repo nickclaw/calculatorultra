@@ -7,6 +7,7 @@ import static com.calculatorultra.gwtultra.client.GwtUltraUtil.WIDTH_SPACES;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode;
 import com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngine;
@@ -30,12 +31,7 @@ public class GwtUltra implements EntryPoint {
 	private Target target;
 	private Hunter hunter;
 	private HumanPlayer humanPlayer;
-	@SuppressWarnings("unused")
-	private List<HumanPlayer> normalHighScores;
-	@SuppressWarnings("unused")
-	private List<HumanPlayer> wrappingHighScores;
-	@SuppressWarnings("unused")
-	private List<HumanPlayer> chaseHighScores;
+	private Map<String, List<HumanPlayer>> top10HighScores;
 	RpcHelper rpcHelper = new RpcHelper();
 	private final Timer timer = new Timer() {
 		@Override
@@ -167,9 +163,9 @@ public class GwtUltra implements EntryPoint {
 				rpcHelper.setNewHighScore(humanPlayer, this);
 			} else highScore = 0;
 			graphics.setHighScore(highScore);
+			rpcHelper.getTop10HighScores(this);
 		}
 		graphics.gameOver();
-		rpcHelper.getTop10HighScores(this);
 	}
 
 	public void moveTarget() {
@@ -335,10 +331,11 @@ public class GwtUltra implements EntryPoint {
 		}
 	}
 	
-	public void updateLeaderboards(List<HumanPlayer> normalHighScores, List<HumanPlayer> wrappingHighScores, List<HumanPlayer> chaseHighScores) {
-		this.normalHighScores = normalHighScores;
-		this.wrappingHighScores = wrappingHighScores;
-		this.chaseHighScores = chaseHighScores;
-		graphics.updateLeaderboards(normalHighScores, wrappingHighScores, chaseHighScores);
+	public void setTop10HighScores(Map<String, List<HumanPlayer>> top10HighScores) {
+		this.top10HighScores = top10HighScores;
+	}
+	
+	public Map<String, List<HumanPlayer>> getTop10HighScores() {
+		return this.top10HighScores;
 	}
 }
