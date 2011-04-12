@@ -21,6 +21,9 @@ import static com.calculatorultra.gwtultra.client.GwtUltraUtil.ZERO;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode.CHASE;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode.REPEATING;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode.WRAPPING;
+import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Speed.HIGH;
+import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Speed.LOW;
+import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Speed.MED;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.BACKGROUND;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.FIELD_OFFSET_X;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.FIELD_OFFSET_Y;
@@ -123,7 +126,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 	private final ArrayList<FieldObject> fieldObjects = new ArrayList<FieldObject>();
 	private final Vector signInDialogBoxPosition = new Vector(70, 323);
 	private final SignInDialogBox signInDialogBox = new SignInDialogBox(this, signInDialogBoxPosition);
-	private final Vector modeDialogBoxPosition = new Vector(370, 333);
+	private final Vector modeDialogBoxPosition = new Vector(370, 300);
 	private final ModeDialogBox modeDialogBox = new ModeDialogBox(this, modeDialogBoxPosition);
 	private final Vector leaderboardDialogBoxPosition = new Vector(70, 250);
 	private LeaderboardDialogBox leaderboardDialogBox;
@@ -337,6 +340,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 	@Override
 	public void onClick(ClickEvent event) {
 		GWT.log("click");
+	
 		if (event.getSource() == resetImage.getWidget()) {
 			gwtUltra.startNewRound();
 			
@@ -554,18 +558,49 @@ public class UltraGraphicsEngine implements ClickHandler {
 				}
 			});
 			
+			Button lowSpeedButton = new Button("L");
+			lowSpeedButton.setStyleName("ultraGraphicsEngine");
+			lowSpeedButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					ultraGraphicsEngine.getGwtUltra().changeSpeed(LOW);
+				}
+			});
+			
+			Button mediumSpeedButton = new Button("M");
+			mediumSpeedButton.setStyleName("ultraGraphicsEngine");
+			mediumSpeedButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					ultraGraphicsEngine.getGwtUltra().changeSpeed(MED);
+				}
+			});
+			
+			Button highSpeedButton = new Button("H");
+			highSpeedButton.setStyleName("ultraGraphicsEngine");
+			highSpeedButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					ultraGraphicsEngine.getGwtUltra().changeSpeed(HIGH);
+				}
+			});
+			
 			setTextAndStyle(flexTable, 1, 0, "Wrapping:", STYLE_GREY_MEDIUM);
 			setTextAndStyle(flexTable, 2, 0, "Chase:", STYLE_GREY_MEDIUM);
 			setTextAndStyle(flexTable, 3, 0, "Repeating:", STYLE_GREY_MEDIUM);
+			setTextAndStyle(flexTable, 4, 0, "Speed:", STYLE_GREY_MEDIUM);
 			flexTable.setWidget(1, 1, wrappingModeButton);
 			flexTable.setWidget(2, 1, chaseModeButton);
 			flexTable.setWidget(3, 1, repeatingModeButton);
+			flexTable.setWidget(4, 1, lowSpeedButton);
+			flexTable.setWidget(4, 2, mediumSpeedButton);
+			flexTable.setWidget(4, 3, highSpeedButton);
 			
 		}
 
 		@Override
 		int numberOfColumns() {
-			return 2;
+			return 4;
 		}
 	}
 }

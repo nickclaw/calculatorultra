@@ -3,6 +3,7 @@ package com.calculatorultra.gwtultra.client;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.HEIGHT_SPACES;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.HIGH_SPEED;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.LOW_SPEED;
+import static com.calculatorultra.gwtultra.client.GwtUltraUtil.MED_SPEED;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.WIDTH_SPACES;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode;
+import com.calculatorultra.gwtultra.client.GwtUltraUtil.Speed;
 import com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngine;
 import com.calculatorultra.gwtultra.shared.HumanPlayer;
 import com.google.gwt.core.client.EntryPoint;
@@ -303,6 +305,25 @@ public class GwtUltra implements EntryPoint {
 						startNewRound();
 						break;
 				
+		}
+	}
+	
+	public void changeSpeed(Speed mode) {
+		switch (mode) {
+			case HIGH: speed = HIGH_SPEED;
+			GWT.log("set High Speed");
+					   timer.scheduleRepeating(speed);
+					   break;
+			
+			case MED: speed = MED_SPEED;
+			GWT.log("set Med Speed");
+					  timer.scheduleRepeating(speed);
+					  break;
+						
+			case LOW: speed = LOW_SPEED;
+			GWT.log("set Low Speed");
+					  timer.scheduleRepeating(speed);
+			   		  break;
 		}
 	}
 	

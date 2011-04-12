@@ -52,8 +52,6 @@ abstract class UltraGraphicsPopupPanel extends DialogBox {
 		this.setWidget(mainPanel);
 		this.setPopupPosition(position.x, position.y);
 		
-		
-		
 	}
 
 	abstract void setUpFlexTable();

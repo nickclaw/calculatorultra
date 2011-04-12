@@ -9,6 +9,7 @@ public class GwtUltraUtil {
 	public static final int HEIGHT_SPACES = 8;
 	public static final int WIDTH_SPACES = 16;
 	public static final int HIGH_SPEED = 100;
+	public static final int MED_SPEED = 200;
 	public static final int LOW_SPEED = 300;
 	public static final int SPACE_SIZE_PX = 50;
 	public static final int SPACE_BAR = 32;
@@ -37,6 +38,10 @@ public class GwtUltraUtil {
 	
 	public static enum Mode {
 		WRAPPING, SPEED, CHASE, REPEATING
+	}
+	
+	public static enum Speed {
+		HIGH, LOW, MED
 	}
 	
 }
