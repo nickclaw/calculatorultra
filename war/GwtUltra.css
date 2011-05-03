@@ -48,29 +48,66 @@
 }
 
 .greySmall {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 	color: #AAAAAA;
 	font-family: ‘Lucida Console’, Monaco, monospace;
     font-size: 12px;
 }
 
 .greyLarge {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 	color: #AAAAAA;
 	font-family: ‘Lucida Console’, Monaco, monospace;
     font-size: 18px;
 }
 
 .greyMedium {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 	color: #AAAAAA;
 	font-family: ‘Lucida Console’, Monaco, monospace;
 }
 
 .blueSmall {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
   font-family: ‘Lucida Console’, Monaco, monospace;
   font-size: 12px;
   color: #6699FF;
 }
 
+.blueSmallCursor {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+  font-family: ‘Lucida Console’, Monaco, monospace;
+  font-size: 12px;
+  color: #6699FF;
+  cursor: pointer;
+}
+
 .greySmallCursor {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 	color: #AAAAAA;
 	font-family: ‘Lucida Console’, Monaco, monospace;
     font-size: 12px;
@@ -78,12 +115,34 @@
 }
 
 .blueLarge {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
   font-family: ‘Lucida Console’, Monaco, monospace;
   font-size: 18px;
   color: #6699FF;
 }
 
+.blueLargeCursor {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+  font-family: ‘Lucida Console’, Monaco, monospace;
+  font-size: 18px;
+  color: #6699FF;
+  cursor: pointer;
+}
+
 .greyLargeCursor {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 	color: #AAAAAA;
 	font-family: ‘Lucida Console’, Monaco, monospace;
     font-size: 18px;
@@ -91,23 +150,54 @@
 }
 
 .blueMedium {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
   font-family: ‘Lucida Console’, Monaco, monospace;
   color: #6699FF;
 }
 
+.blueMediumCursor {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+  font-family: ‘Lucida Console’, Monaco, monospace;
+  color: #6699FF;
+  cursor: pointer;
+}
+
 .greyMediumCursor {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 	color: #AAAAAA;
 	font-family: ‘Lucida Console’, Monaco, monospace;
 	cursor: pointer;
 }
 
 .blueBold {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
   font-family: ‘Lucida Console’, Monaco, monospace;
   color: #6699FF;
 	font-weight: bold;
 }
 
 .greyBold {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 	color: #AAAAAA;
 	font-family: ‘Lucida Console’, Monaco, monospace;
 	font-weight: bold;

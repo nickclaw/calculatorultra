@@ -32,6 +32,9 @@ public class UltraServiceImpl extends RemoteServiceServlet implements UltraServi
 					return arg1.getNormalHighScore() - arg0.getNormalHighScore();
 				}
 			});
+			while (normalHighScores.size() > 10) {
+				normalHighScores.remove(10);
+			}
 			top10HighScores.put("normal", normalHighScores);
 			
 			List<HumanPlayer> wrappingHighScores = awsSimpleDB.getAllHumanPlayers();
@@ -41,6 +44,9 @@ public class UltraServiceImpl extends RemoteServiceServlet implements UltraServi
 					return arg1.getWrappingHighScore() - arg0.getWrappingHighScore();
 				}
 			});
+			while (wrappingHighScores.size() > 10) {
+				wrappingHighScores.remove(10);
+			}
 			top10HighScores.put("wrapping", wrappingHighScores);
 			
 			List<HumanPlayer> chaseHighScores = awsSimpleDB.getAllHumanPlayers();
@@ -50,6 +56,9 @@ public class UltraServiceImpl extends RemoteServiceServlet implements UltraServi
 					return arg1.getChaseHighScore() - arg0.getChaseHighScore();
 				}
 			});
+			while (chaseHighScores.size() > 10) {
+				chaseHighScores.remove(10);
+			}
 			top10HighScores.put("chase", chaseHighScores);
 			return top10HighScores;
 		}
@@ -122,6 +131,16 @@ public class UltraServiceImpl extends RemoteServiceServlet implements UltraServi
 			}
 		} return awsSimpleDB;
 		
+	}
+
+
+
+	@Override
+	public void gamePlayed(String name, double timePlayed) {
+		AwsSimpleDBConnector awsSimpleDB = createAwsConnector();
+		if (awsSimpleDB != null) {
+			awsSimpleDB.gamePlayed(name, timePlayed);
+		}
 	}
 
 }

@@ -9,6 +9,7 @@ import static com.calculatorultra.gwtultra.client.GwtUltraUtil.HEIGHT_SPACES;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.LEFT;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.LEFT_ARROW;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.N;
+import static com.calculatorultra.gwtultra.client.GwtUltraUtil.P;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.RIGHT;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.RIGHT_ARROW;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.S;
@@ -21,9 +22,6 @@ import static com.calculatorultra.gwtultra.client.GwtUltraUtil.ZERO;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode.CHASE;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode.REPEATING;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode.WRAPPING;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Speed.HIGH;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Speed.LOW;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Speed.MED;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.BACKGROUND;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.FIELD_OFFSET_X;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.FIELD_OFFSET_Y;
@@ -34,17 +32,21 @@ import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraph
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.RESET_OVERLAY;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.SPACE_HEIGHT;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.SPACE_WIDTH;
+import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.SPEED_SLIDER;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_BLUE_LARGE;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_BLUE_SMALL;
+import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_BLUE_SMALL_CURSOR;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_BOLD;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_LARGE_CURSOR;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_MEDIUM;
+import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_SMALL_CURSOR;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_OPACITY_40;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.TARGET;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.TONEY_IS_ANGRY;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createImageWithClickHandler;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createImageWithStyle;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createLabelWithStyle;
+import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createLabelWithStyleAndClickHandler;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createLabelWithStyleChangeAndClickHandler;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.setTextAndStyle;
 
@@ -70,6 +72,13 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
@@ -86,8 +95,8 @@ public class UltraGraphicsEngine implements ClickHandler {
 	
 	private final GraphicsObject<Canvas> canvas = new GraphicsObject<Canvas>(Canvas.createIfSupported(), new Vector(0,0));
 	Vector position = new Vector(10,10);
-	static final int canvasHeight = 700;
-	static final int canvasWidth = 1000;
+	static final int CANVAS_HEIGHT = 700;
+	static final int CANVAS_WIDTH = 1000;
 	Context2d context;
 	
 	static final int SCORES_POSITIONS_X = 725;
@@ -110,28 +119,39 @@ public class UltraGraphicsEngine implements ClickHandler {
 	private final GraphicsObject<Label> averagePointsValueLabel = new GraphicsObject<Label> (createLabelWithStyle("0000", STYLE_BLUE_SMALL), averagePointsValueLabelPosition);
 	private final Vector remainingTargetMovesValueLabelPosition = new Vector(837, BOTTOM_ROW_Y);
 	private final GraphicsObject<Label> remainingTargetMovesValueLabel = new GraphicsObject<Label> (createLabelWithStyle("0000", STYLE_BLUE_SMALL), remainingTargetMovesValueLabelPosition);
+	private final Vector wrappingLabelPosition = new Vector(581, TOP_ROW_Y);
+	private final GraphicsObject<Label> wrappingLabel = new GraphicsObject<Label> (createLabelWithStyleAndClickHandler("Wrap", STYLE_BLUE_SMALL_CURSOR, this), wrappingLabelPosition);
+	private final Vector chaseLabelPosition = new Vector(528, TOP_ROW_Y);
+	private final GraphicsObject<Label> chaseLabel = new GraphicsObject<Label> (createLabelWithStyleAndClickHandler("Chase", STYLE_BLUE_SMALL_CURSOR, this), chaseLabelPosition);
+	private final Vector repeatingLabelPosition = new Vector(473, TOP_ROW_Y);
+	private final GraphicsObject<Label> repeatingLabel = new GraphicsObject<Label> (createLabelWithStyleAndClickHandler("Repeat", STYLE_BLUE_SMALL_CURSOR, this), repeatingLabelPosition);
+	private final Vector speedLabelPosition = new Vector(580, 530);
+	private final GraphicsObject<Label> speedLabel = new GraphicsObject<Label> (createLabelWithStyleAndClickHandler("High", STYLE_GREY_SMALL_CURSOR, this), speedLabelPosition);
 	private final GraphicsObject<Image> resetImage = new GraphicsObject<Image> (createImageWithClickHandler(RESET_OVERLAY, this), new Vector(FIELD_OFFSET_X, FIELD_OFFSET_Y));
 	private final GraphicsObject<Image> background = new GraphicsObject<Image> (createImageWithStyle(BACKGROUND, STYLE_OPACITY_40), new Vector(0, 0));
+	private final GraphicsObject<Image> speedSlider = new GraphicsObject<Image> (createImageWithStyle(SPEED_SLIDER, STYLE_OPACITY_40), new Vector(580, 512));
 	private GraphicsObject<Image> hitCounter;
 	private final Vector signInLabelPosition = new Vector(82, MIDDLE_ROW_Y);
 	private final GraphicsObject<Label> signInLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Sign In", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), signInLabelPosition);
-	private final Vector modeLabelPosition = new Vector(398, MIDDLE_ROW_Y);
-	private final GraphicsObject<Label> modeLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Mode", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), modeLabelPosition);
+	private final Vector instructionsLabelPosition = new Vector(298, MIDDLE_ROW_Y);
+	private final GraphicsObject<Label> instructionsLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Instructions", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), instructionsLabelPosition);
 	private final Vector leaderboardLabelPosition = new Vector(190, MIDDLE_ROW_Y);
 	private final GraphicsObject<Label> leaderboardLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Stats", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), leaderboardLabelPosition);
 	private final FocusPanel focusPanel = new FocusPanel();
 	private final AbsolutePanel absPanel = new AbsolutePanel();
-	private final  GwtUltra gwtUltra;
+	private final GwtUltra gwtUltra;
 	private final ArrayList<GraphicsObject<?>> graphicsObjects = new ArrayList<GraphicsObject<?>>();
 	private final ArrayList<FieldObject> fieldObjects = new ArrayList<FieldObject>();
-	private final Vector signInDialogBoxPosition = new Vector(70, 323);
+	private final Vector signInDialogBoxPosition = new Vector(67, 323);
 	private final SignInDialogBox signInDialogBox = new SignInDialogBox(this, signInDialogBoxPosition);
-	private final Vector modeDialogBoxPosition = new Vector(370, 300);
-	private final ModeDialogBox modeDialogBox = new ModeDialogBox(this, modeDialogBoxPosition);
-	private final Vector leaderboardDialogBoxPosition = new Vector(70, 250);
+	private final Vector instructionsDialogBoxPosition = new Vector(70, 70);
+	private final InstructionsDialogBox instructionsDialogBox = new InstructionsDialogBox(this, instructionsDialogBoxPosition);
+	private final Vector leaderboardDialogBoxPosition = new Vector(70, 70);
 	private LeaderboardDialogBox leaderboardDialogBox;
 	private boolean isToneysFace = false;
-	//private final Label cursor = new Label("A");
+	private MouseMoveHandler mouseMoveHandler;
+	private HandlerRegistration mouseMoveHandlerRegistration;
+	private HandlerRegistration mouseUpHandlerRegistration;
 	public UltraGraphicsEngine(GwtUltra gwtUltra) {
 		this.gwtUltra = gwtUltra;
 	}
@@ -143,10 +163,10 @@ public class UltraGraphicsEngine implements ClickHandler {
 	public void setupGame() {
 		
         canvas.getWidget().setStyleName("mainCanvas");
-        canvas.getWidget().setWidth(canvasWidth + "px");
-        canvas.getWidget().setCoordinateSpaceWidth(canvasWidth);
-        canvas.getWidget().setHeight(canvasHeight + "px");
-        canvas.getWidget().setCoordinateSpaceHeight(canvasHeight);        
+        canvas.getWidget().setWidth(CANVAS_WIDTH + "px");
+        canvas.getWidget().setCoordinateSpaceWidth(CANVAS_WIDTH);
+        canvas.getWidget().setHeight(CANVAS_HEIGHT + "px");
+        canvas.getWidget().setCoordinateSpaceHeight(CANVAS_HEIGHT);        
 		context = canvas.getWidget().getContext2d();
 		
 		
@@ -154,46 +174,47 @@ public class UltraGraphicsEngine implements ClickHandler {
 		focusPanel.setStyleName("ultraGraphicsEngine");
 		focusPanel.setFocus(true);
 		focusPanel.addClickHandler(this);
-		/**
-		focusPanel.addMouseMoveHandler(new MouseMoveHandler() {
-			@Override
-			public void onMouseMove(MouseMoveEvent event) {
-				if (event.getX() > 880 && event.getX() < 1000
-						&& event.getY() > 480 && event.getY() < 600) {
-					field.remove(cursor);
-					field.insert(cursor, event.getX(), event.getY(), graphicsObjects.size());
-				}
-			}
-		});
-		**/
+		setupSpeedSlider();
 		focusPanel.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
+				event.preventDefault();
 				Integer key = event.getNativeKeyCode();
 				GWT.log(key.toString());
-				if ((key == W) || (key == UP_ARROW)) {
-					event.preventDefault();
+				switch (key) {
+				case W:
+				case UP_ARROW:
 					gwtUltra.getPlayer().setDirection(UP);
-				} else if ((key == A) || (key == LEFT_ARROW)) {
-					event.preventDefault();
+					break;
+				case A:
+				case LEFT_ARROW:
 					gwtUltra.getPlayer().setDirection(LEFT);
-				} else if ((key == S) || (key == DOWN_ARROW)) {
-					event.preventDefault();
+					break;
+				case S:
+				case DOWN_ARROW:
 					gwtUltra.getPlayer().setDirection(DOWN);
-				} else if ((key == D) || (key == RIGHT_ARROW)) {
-					event.preventDefault();
+					break;
+				case D:
+				case RIGHT_ARROW:
 					gwtUltra.getPlayer().setDirection(RIGHT);
-				} else if ((key == E) || (key == ZERO)) {
+					break;
+				case E:
+				case ZERO:
 					gwtUltra.moveTarget();
-				} else if ((key == N) || (key == SPACE_BAR)) {
+					break;
+				case N:
+				case SPACE_BAR:
 					gwtUltra.startNewRound();
+					break;
+				case P:
+					gwtUltra.pause();
+					break;
 				}
 			}
 		});
 		rootPanel.add(focusPanel);
 		
 		//Add all the GraphicsObjects to the ArrayList
-		//graphicsObjects.add(background);
 		graphicsObjects.add(canvas);
 		graphicsObjects.add(scoreLabel);
 		graphicsObjects.add(highScoreLabel);
@@ -209,7 +230,11 @@ public class UltraGraphicsEngine implements ClickHandler {
 		}
 		graphicsObjects.add(signInLabel);
 		graphicsObjects.add(leaderboardLabel);
-		graphicsObjects.add(modeLabel);
+		graphicsObjects.add(instructionsLabel);
+		graphicsObjects.add(wrappingLabel);
+		graphicsObjects.add(chaseLabel);
+		graphicsObjects.add(repeatingLabel);
+		//graphicsObjects.add(speedLabel);
 		
 		focusPanel.add(absPanel);
 		absPanel.setSize("939px", "1000px");
@@ -219,6 +244,42 @@ public class UltraGraphicsEngine implements ClickHandler {
 		Window.enableScrolling(false);
 		Window.setTitle("Ultra");
 
+	}
+
+	private void setupSpeedSlider() {
+		mouseMoveHandler = new MouseMoveHandler() {
+			@Override
+			public void onMouseMove(MouseMoveEvent event) {
+				if (event.getX() >= 471 && event.getX() <= 589) {
+					int space = ((event.getX()-480) / 20);
+					speedSlider.setXPosition(480 + 20 * space);
+					gwtUltra.setSpeed(10 - 2 * space);
+					speedLabel.getWidget().setText("Speed " + gwtUltra.getSpeed());
+				} else {
+					mouseMoveHandlerRegistration.removeHandler();
+				}
+			}
+		};
+		focusPanel.addMouseDownHandler(new MouseDownHandler() {
+			@Override
+			public void onMouseDown(MouseDownEvent event) {
+				if (speedSlider.getXPosition() <= event.getX() 
+						&& (speedSlider.getXPosition() + 20) >= event.getX()
+						&& speedSlider.getYPosition() <= event.getY()
+						&& (speedSlider.getYPosition() + 20) >= event.getY()) {
+					mouseMoveHandlerRegistration = focusPanel.addMouseMoveHandler(mouseMoveHandler);
+				}
+			}
+		});
+		
+		mouseUpHandlerRegistration = focusPanel.addMouseUpHandler(new MouseUpHandler() {
+			@Override
+			public void onMouseUp(MouseUpEvent event) {
+				mouseMoveHandlerRegistration.removeHandler();
+				gwtUltra.gameOver();
+			}
+		});
+		
 	}
 
 	public void resetField() {
@@ -268,9 +329,10 @@ public class UltraGraphicsEngine implements ClickHandler {
 		//GWT.log("paint");
 		Context2d context = canvas.getWidget().getContext2d();
 		
-		context.setGlobalAlpha(.4);
+		context.setGlobalAlpha(gwtUltra.getSpeed() * .0033);
 		context.drawImage(((ImageElement) (background.getWidget()).getElement().cast()), background.getXPosition(), background.getYPosition());
-		
+		context.setGlobalAlpha(1);
+		context.drawImage(((ImageElement) (speedSlider.getWidget()).getElement().cast()), speedSlider.getXPosition(), speedSlider.getYPosition());
 		
 		for(FieldObject object : fieldObjects) {
 			if (((object.getPosition().x) < 0)
@@ -340,20 +402,42 @@ public class UltraGraphicsEngine implements ClickHandler {
 	@Override
 	public void onClick(ClickEvent event) {
 		GWT.log("click");
-	
 		if (event.getSource() == resetImage.getWidget()) {
 			gwtUltra.startNewRound();
 			
 		} else if (event.getSource() == signInLabel.getWidget()) {
-			signInDialogBox.show();
-			
-		} else if (event.getSource() == modeLabel.getWidget()) {
-			modeDialogBox.show();	
+			signInDialogBox.show();	
+		
+		} else if (event.getSource() == instructionsLabel.getWidget()) {
+			instructionsDialogBox.show();	
 			
 		} else if (event.getSource() == leaderboardLabel.getWidget()) {
 			leaderboardDialogBox = new LeaderboardDialogBox(this, leaderboardDialogBoxPosition, gwtUltra.getTop10HighScores(), gwtUltra.getHumanPlayer());
 			leaderboardDialogBox.show();
-		
+			
+		} else if (event.getSource() == wrappingLabel.getWidget()) {
+			gwtUltra.changeMode(WRAPPING);
+			if (wrappingLabel.getWidget().getStyleName().equals(STYLE_BLUE_SMALL_CURSOR)) {
+				wrappingLabel.getWidget().setStyleName(STYLE_GREY_SMALL_CURSOR);
+			} else {
+				wrappingLabel.getWidget().setStyleName(STYLE_BLUE_SMALL_CURSOR);
+			}
+			
+		} else if (event.getSource() == chaseLabel.getWidget()) {
+			gwtUltra.changeMode(CHASE);
+			if (chaseLabel.getWidget().getStyleName().equals(STYLE_BLUE_SMALL_CURSOR)) {
+				chaseLabel.getWidget().setStyleName(STYLE_GREY_SMALL_CURSOR);
+			} else {
+				chaseLabel.getWidget().setStyleName(STYLE_BLUE_SMALL_CURSOR);
+			}
+			
+		} else if (event.getSource() == repeatingLabel.getWidget()) {
+			gwtUltra.changeMode(REPEATING);
+			if (repeatingLabel.getWidget().getStyleName().equals(STYLE_BLUE_SMALL_CURSOR)) {
+				repeatingLabel.getWidget().setStyleName(STYLE_GREY_SMALL_CURSOR);
+			} else {
+				repeatingLabel.getWidget().setStyleName(STYLE_BLUE_SMALL_CURSOR);
+			}
 		} else if (event.getSource() == focusPanel) {
 			if ((event.getX() >= 708) && (event.getX() <= 730)
 					&& (event.getY() >= 540) && (event.getY() <= 555)
@@ -520,87 +604,20 @@ public class UltraGraphicsEngine implements ClickHandler {
 		}
 	}
 	
-	public static class ModeDialogBox extends UltraGraphicsPopupPanel {
+	public static class InstructionsDialogBox extends UltraGraphicsPopupPanel {
 		
-		public ModeDialogBox(final UltraGraphicsEngine ultraGraphicsEngine, final Vector position) {
-			super("Mode", ultraGraphicsEngine, position);
+		public InstructionsDialogBox(final UltraGraphicsEngine ultraGraphicsEngine, final Vector position) {
+			super("Instructions", ultraGraphicsEngine, position);
 		}
 
 		@Override
 		void setUpFlexTable() {
-			Button wrappingModeButton = new Button("W");
-			wrappingModeButton.setStyleName("ultraGraphicsEngine");
-			wrappingModeButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					ultraGraphicsEngine.getGwtUltra().changeMode(WRAPPING);
-				}
-			});
-			
-			Button chaseModeButton = new Button("C");
-			chaseModeButton.setStyleName("ultraGraphicsEngine");
-			chaseModeButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					ultraGraphicsEngine.getGwtUltra().changeMode(CHASE);
-					if (!ultraGraphicsEngine.getGwtUltra().isWrappingMode()) {
-						ultraGraphicsEngine.getGwtUltra().changeMode(WRAPPING);
-					}
-				}
-			});
-			
-			Button repeatingModeButton = new Button("R");
-			repeatingModeButton.setStyleName("ultraGraphicsEngine");
-			repeatingModeButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					ultraGraphicsEngine.getGwtUltra().changeMode(REPEATING);
-				}
-			});
-			
-			Button lowSpeedButton = new Button("L");
-			lowSpeedButton.setStyleName("ultraGraphicsEngine");
-			lowSpeedButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					ultraGraphicsEngine.getGwtUltra().changeSpeed(LOW);
-				}
-			});
-			
-			Button mediumSpeedButton = new Button("M");
-			mediumSpeedButton.setStyleName("ultraGraphicsEngine");
-			mediumSpeedButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					ultraGraphicsEngine.getGwtUltra().changeSpeed(MED);
-				}
-			});
-			
-			Button highSpeedButton = new Button("H");
-			highSpeedButton.setStyleName("ultraGraphicsEngine");
-			highSpeedButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					ultraGraphicsEngine.getGwtUltra().changeSpeed(HIGH);
-				}
-			});
-			
-			setTextAndStyle(flexTable, 1, 0, "Wrapping:", STYLE_GREY_MEDIUM);
-			setTextAndStyle(flexTable, 2, 0, "Chase:", STYLE_GREY_MEDIUM);
-			setTextAndStyle(flexTable, 3, 0, "Repeating:", STYLE_GREY_MEDIUM);
-			setTextAndStyle(flexTable, 4, 0, "Speed:", STYLE_GREY_MEDIUM);
-			flexTable.setWidget(1, 1, wrappingModeButton);
-			flexTable.setWidget(2, 1, chaseModeButton);
-			flexTable.setWidget(3, 1, repeatingModeButton);
-			flexTable.setWidget(4, 1, lowSpeedButton);
-			flexTable.setWidget(4, 2, mediumSpeedButton);
-			flexTable.setWidget(4, 3, highSpeedButton);
-			
+			setTextAndStyle(flexTable, 1, 0, "Use the arrow keys to move your player around the screen hitting the yellow targets. The faster you get to the target the more points it is worth, but don't hit the white circles or hit the edge. If High Speed is to fast for you, try a slower speed by clicking the Low or Med buttons. Wrapping mode will allow you to teleport across the screen when you hit an edge. Repeating mode will always respawn the targets in the same places. Chase mode is -- well you can find out for yourself! Sign in to save your High Scores and view the leaderboards.", STYLE_GREY_MEDIUM);
 		}
 
 		@Override
 		int numberOfColumns() {
-			return 4;
+			return 5;
 		}
 	}
 }

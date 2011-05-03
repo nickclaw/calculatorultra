@@ -27,6 +27,7 @@ public class GwtUltraUtil {
 	public static final int S = 83;
 	public static final int D = 68;
 	public static final int N = 78;
+	public static final int P = 100;
 	public static final int LEFT_ARROW = 37;
 	public static final int RIGHT_ARROW = 39;
 	public static final int UP_ARROW = 38;

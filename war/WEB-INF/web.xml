@@ -14,7 +14,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>UltraServiceImpl</servlet-name>
-		<url-pattern>gwtultra/ultraServer</url-pattern>
+		<url-pattern>/gwtultra/ultraServer</url-pattern>
 	</servlet-mapping>
   
   <!-- Default page to serve -->

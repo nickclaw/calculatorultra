@@ -18,6 +18,9 @@ public interface UltraServiceAsync {
 	void signIn(String name, String password,
 			AsyncCallback<HumanPlayer> callback);
 
+	void gamePlayed(String name, double timePlayed,
+			AsyncCallback<Void> voidCallback);
+
 	
 
 }

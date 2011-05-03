@@ -8,6 +8,9 @@ public class HumanPlayer implements IsSerializable{
 	private Integer normalHighScore = 0;
 	private Integer wrappingHighScore = 0;
 	private Integer chaseHighScore = 0;
+	private Integer gamesPlayed = 0;
+	private Double timePlayed = new Double(0);
+	
 	
 	public HumanPlayer() {
 		
@@ -18,12 +21,14 @@ public class HumanPlayer implements IsSerializable{
 		this.password = password;
 	}
 	
-	public HumanPlayer(String name, String password, int normalHighScore, int wrappingHighScore, int chaseHighScore) {
+	public HumanPlayer(String name, String password, int normalHighScore, int wrappingHighScore, int chaseHighScore, int gamesPlayed, double timePlayed) {
 		this.name = name;
 		this.password = password;
 		this.normalHighScore = normalHighScore;
 		this.wrappingHighScore = wrappingHighScore;
 		this.chaseHighScore = chaseHighScore;
+		this.gamesPlayed = gamesPlayed;
+		this.timePlayed = timePlayed; 
 	}
 	
 	public int getNormalHighScore() {
@@ -60,6 +65,38 @@ public class HumanPlayer implements IsSerializable{
 
 	public void setChaseHighScore(int chaseHighScore) {
 		this.chaseHighScore = chaseHighScore;
+	}
+	
+	public int getGamesPlayed() {
+		return gamesPlayed;
+	}
+
+	public String getGamesPlayedString() {
+		return gamesPlayed.toString();
+	}
+
+	public void setGamesPlayed(int gamesPlayed) {
+		this.gamesPlayed = gamesPlayed;
+	}
+	
+	public void gamePlayed() {
+		this.gamesPlayed++;
+	}
+	
+	public double getTimePlayed() {
+		return timePlayed;
+	}
+
+	public String getTimePlayedString() {
+		return timePlayed.toString();
+	}
+
+	public void setTimePlayed(double timePlayed) {
+		this.timePlayed = timePlayed;
+	}
+	
+	public void addTimePlayed(double timePlayed) {
+		this.timePlayed = this.timePlayed + timePlayed;
 	}
 	
 	public String getName() {

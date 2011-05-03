@@ -16,6 +16,8 @@ package com.calculatorultra.gwtultra.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
@@ -44,8 +46,29 @@ public class AwsSimpleDBConnector {
                 AwsSimpleDBConnector.class.getResourceAsStream("AwsCredentials.properties")));
 
         System.out.println("Starting a new connection with AWS\n");
-        /**
+        
         try {
+        	//Clear domain
+            //sdb.deleteDomain(new DeleteDomainRequest(myDomain));
+            //sdb.createDomain(new CreateDomainRequest(myDomain));
+        	
+        	// Add Field
+            String selectExpression = "select * from `" + myDomain + "`";
+            SelectRequest selectRequest = new SelectRequest(selectExpression);
+            for (Item item : sdb.select(selectRequest).getItems()) {
+                List<ReplaceableAttribute> replaceableAttributes = new ArrayList<ReplaceableAttribute>();
+                replaceableAttributes.add(new ReplaceableAttribute("Time", "0", true));
+                sdb.putAttributes(new PutAttributesRequest(myDomain, item.getName(), replaceableAttributes));
+                System.out.println(item.getName());
+                for (Attribute attribute : item.getAttributes()) {
+                    System.out.println("      Attribute");
+                    System.out.println("        Name:  " + attribute.getName());
+                }
+                System.out.println();
+            }
+            System.out.println();
+            
+            /**
             // Create a domain
             System.out.println("Creating domain called " + myDomain + ".\n");
             sdb.createDomain(new CreateDomainRequest(myDomain));
@@ -100,6 +123,7 @@ public class AwsSimpleDBConnector {
             // Delete a domain
             System.out.println("Deleting " + myDomain + " domain.\n");
             //sdb.deleteDomain(new DeleteDomainRequest(myDomain));
+        **/
         } catch (AmazonServiceException ase) {
             System.out.println("Caught an AmazonServiceException, which means your request made it "
                     + "to Amazon SimpleDB, but was rejected with an error response for some reason.");
@@ -114,14 +138,12 @@ public class AwsSimpleDBConnector {
                     + "such as not being able to access the network.");
             System.out.println("Error Message: " + ace.getMessage());
         }
-        **/
     }
 
     /**
      * Creates an array of SimpleDB ReplaceableItems populated with sample data.
      *
      * @return An array of sample item data.
-     */
     private static List<ReplaceableItem> createSampleData() {
         List<ReplaceableItem> sampleData = new ArrayList<ReplaceableItem>();
 
@@ -162,6 +184,7 @@ public class AwsSimpleDBConnector {
 
         return sampleData;
     }
+     */
     
     public void registerPlayer(HumanPlayer humanPlayer) {
         System.out.println("START Registering new Player: " + humanPlayer.getName() + "\n");
@@ -174,7 +197,6 @@ public class AwsSimpleDBConnector {
                 new ReplaceableAttribute("ChaseHighScore", "0", true)));
         sdb.batchPutAttributes(new BatchPutAttributesRequest(myDomain, newPlayers));
         System.out.println("	" + humanPlayer.getName());
-        System.out.println("	" + humanPlayer.getPassword());
         System.out.println("DONE Registering new Player: " + humanPlayer.getName() + "\n");
     }
     
@@ -198,7 +220,6 @@ public class AwsSimpleDBConnector {
             	} else if (attribute.getName().equals("ChaseHighScore")) {
             		newHumanPlayer.setChaseHighScore(new Integer(attribute.getValue()));
             	} 
-            	System.out.println("	" + attribute.getValue());
             }
         	System.out.println();
         	top10HighScores.add(newHumanPlayer);
@@ -246,6 +267,8 @@ public class AwsSimpleDBConnector {
             		newHumanPlayer.setWrappingHighScore(new Integer(attribute.getValue()));
             	} else if (attribute.getName().equals("ChaseHighScore")) {
             		newHumanPlayer.setChaseHighScore(new Integer(attribute.getValue()));
+            	} else if (attribute.getName().equals("Games")) {
+            		newHumanPlayer.setGamesPlayed(new Integer(attribute.getValue()));
             	} 
             	System.out.println(attribute.getValue());
             }
@@ -253,5 +276,34 @@ public class AwsSimpleDBConnector {
         	matchingPlayers.add(newHumanPlayer);
         }
         return matchingPlayers;
+    }
+    
+    public void gamePlayed(String name, double time) {
+    	System.out.println("Getting player named: " + name);
+    	String selectExpression = "select * from `" + myDomain + "` where Name = '" + name + "'";
+    	SelectRequest selectRequest = new SelectRequest(selectExpression);
+        for (Item item : sdb.select(selectRequest).getItems()) {
+        	System.out.println("     Found a player named: " + name);
+        	Double gamesPlayed = new Double(0);
+        	Double timePlayed = new Double(0);
+            for (Attribute attribute : item.getAttributes()) {
+            	if (attribute.getName().equals("Games")) {
+            		gamesPlayed = new Double(attribute.getValue());
+            	} else if (attribute.getName().equals("Time")) {
+            		timePlayed = new Double(attribute.getValue());
+            	}
+            	System.out.println(attribute.getValue());
+            }
+            gamesPlayed++;
+            timePlayed = timePlayed + time;
+            List<ReplaceableAttribute> replaceableAttributes = new ArrayList<ReplaceableAttribute>();
+            replaceableAttributes.add(new ReplaceableAttribute("Games", gamesPlayed.toString(), true));
+        	System.out.println(gamesPlayed.toString());
+            replaceableAttributes.add(new ReplaceableAttribute("Time", timePlayed.toString(), true));
+        	System.out.println(timePlayed.toString());
+            sdb.putAttributes(new PutAttributesRequest(myDomain, item.getName(), replaceableAttributes));
+        	System.out.println();
+        	
+        }
     }
 }

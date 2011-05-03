@@ -17,4 +17,6 @@ public interface UltraService extends RemoteService {
 	HumanPlayer signIn(String name, String password);
 	
 	void setNewHighScore(HumanPlayer humanPlayer);
+
+	void gamePlayed(String name, double timePlayed);
 }

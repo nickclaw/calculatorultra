@@ -94,5 +94,9 @@ public class RpcHelper {
 		service.getScores(updateLeaderboardsCallback);	
 	}
 	
+	public void gamePlayed(HumanPlayer humanPlayer, GwtUltra gwtUltra) {
+		rpcCaller = gwtUltra;
+		service.gamePlayed(humanPlayer.getName(), humanPlayer.getTimePlayed(), voidCallback);
+	}
 	
 }

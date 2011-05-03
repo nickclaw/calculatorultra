@@ -21,6 +21,14 @@ public class GraphicsObject<TWidget extends Widget> {
 	public void setPosition(Vector position) {
 		this.position = position;
 	}
+	
+	public void setXPosition(int xPosition) {
+		this.position.x = xPosition;
+	}
+	
+	public void setYPosition(int yPosition) {
+		this.position.y = yPosition;
+	}
 
 	public int getXPosition() {
 		return position.x;

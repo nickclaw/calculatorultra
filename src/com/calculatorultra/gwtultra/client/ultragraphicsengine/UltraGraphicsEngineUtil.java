@@ -31,6 +31,9 @@ public class UltraGraphicsEngineUtil {
 	public static final String STYLE_GREY_SMALL_CURSOR = "greySmallCursor";
 	public static final String STYLE_GREY_MEDIUM_CURSOR = "greyMediumCursor";
 	public static final String STYLE_GREY_LARGE_CURSOR = "greyLargeCursor";
+	public static final String STYLE_BLUE_SMALL_CURSOR = "blueSmallCursor";
+	public static final String STYLE_BLUE_MEDIUM_CURSOR = "blueMediumCursor";
+	public static final String STYLE_BLUE_LARGE_CURSOR = "blueLargeCursor";
 	public static final String STYLE_OPACITY_40 = "imageOpacity";
 	
 	public static final String PLAYER = "images/player.png";
@@ -40,6 +43,7 @@ public class UltraGraphicsEngineUtil {
 	public static final String HUNTER = "images/hunter.png";
 	public static final String TONEY_IS_ANGRY = "images/toneyIsAngry.png";
 	public static final String RESET_OVERLAY = "images/resetOverlay.png";
+	public static final String SPEED_SLIDER = "images/speedSlider.jpg";
 	
 	public static void setTextAndStyle(FlexTable flexTable, int row, int column, String text, String style) {
 		flexTable.setText(row, column, text);
@@ -123,6 +127,13 @@ public class UltraGraphicsEngineUtil {
 	public static Label createLabelWithStyle(String labelText, final String style) {
 		final Label label = new Label(labelText);
 		label.setStyleName(style);
+		return label;
+	}
+	
+	public static Label createLabelWithStyleAndClickHandler(String labelText, final String style, ClickHandler clickHandler) {
+		final Label label = new Label(labelText);
+		label.setStyleName(style);
+		label.addClickHandler(clickHandler);
 		return label;
 	}
 }

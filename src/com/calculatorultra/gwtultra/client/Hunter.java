@@ -253,7 +253,44 @@ public class Hunter extends MovingFieldObject {
 		}
 		else
 		{
-			return new Vector(0, 0);
+			Vector distanceFromTarget = new Vector(Math.abs(position.x - target.position.x), Math.abs(position.y - target.position.y));
+			boolean upIsOpen = checkOpen(new Vector(position.x, position.y - 1));
+			boolean downIsOpen = checkOpen(new Vector(position.x, position.y + 1));
+			boolean leftIsOpen = checkOpen(new Vector(position.x - 1, position.y));
+			boolean rightIsOpen = checkOpen(new Vector(position.x + 1, position.y));
+			
+			if(distanceFromTarget.x >= distanceFromTarget.y && leftIsOpen && position.x > target.position.x) {
+				return LEFT_VECTOR;
+			}
+			else if(distanceFromTarget.x >= distanceFromTarget.y && rightIsOpen && position.x < target.position.x) {
+				return RIGHT_VECTOR;
+			}
+			else if(downIsOpen && position.y <= target.position.y) {
+				return DOWN_VECTOR;
+			}
+			else if(upIsOpen && position.y >= target.position.y) {
+				return UP_VECTOR;
+			}
+			else if(leftIsOpen && position.x >= target.position.x) {
+				return LEFT_VECTOR;
+			}
+			else if(rightIsOpen && position.x <= target.position.x) {
+				return RIGHT_VECTOR;
+			}
+			else if(downIsOpen) {
+				return DOWN_VECTOR;
+			}
+			else if(upIsOpen) {
+				return UP_VECTOR;
+			}
+			else if(leftIsOpen) {
+				return LEFT_VECTOR;
+			}
+			else if(rightIsOpen) {
+				return RIGHT_VECTOR;
+			}
+			else
+				return new Vector(0,0); 
 		}
 	}
 

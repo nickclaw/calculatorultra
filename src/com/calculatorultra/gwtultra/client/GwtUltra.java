@@ -2,8 +2,6 @@ package com.calculatorultra.gwtultra.client;
 
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.HEIGHT_SPACES;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.HIGH_SPEED;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.LOW_SPEED;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.MED_SPEED;
 import static com.calculatorultra.gwtultra.client.GwtUltraUtil.WIDTH_SPACES;
 
 import java.util.ArrayList;
@@ -11,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode;
-import com.calculatorultra.gwtultra.client.GwtUltraUtil.Speed;
 import com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngine;
 import com.calculatorultra.gwtultra.shared.HumanPlayer;
 import com.google.gwt.core.client.EntryPoint;
@@ -33,6 +30,8 @@ public class GwtUltra implements EntryPoint {
 	private Target target;
 	private Hunter hunter;
 	private HumanPlayer humanPlayer;
+	private double roundTime = 0;
+	private final boolean isPaused = false;
 	private Map<String, List<HumanPlayer>> top10HighScores;
 	RpcHelper rpcHelper = new RpcHelper();
 	private final Timer timer = new Timer() {
@@ -43,6 +42,9 @@ public class GwtUltra implements EntryPoint {
 				moveHunter();
 			}
 			graphics.repaint();
+			if (player.direction.equals(new Vector(0,0))) {
+				roundTime += speed;
+			}
 		}
 	};
 
@@ -72,6 +74,7 @@ public class GwtUltra implements EntryPoint {
 					HEIGHT_SPACES - startPosition.y - 1), player, target, this);
 		}
 		newTarget();
+		roundTime = 0;
 		timer.scheduleRepeating(speed);
 		graphics.setScore(0);
 		graphics.setAveragePoints(0);
@@ -100,7 +103,7 @@ public class GwtUltra implements EntryPoint {
 		}
 		player.move();
 		if (isChaseMode && player.position.equals(hunter.position)) {
-			gameOver(player.score);
+			gameOver();
 		} else if (player.position.equals(target.position)) {
 			targetHit();
 
@@ -109,12 +112,12 @@ public class GwtUltra implements EntryPoint {
 				|| ((player.position.x) >= WIDTH_SPACES)
 				|| ((player.position.y) < 0)
 				|| ((player.position.y) >= HEIGHT_SPACES)) {
-			gameOver(player.score);
+			gameOver();
 		} else {
 			// Checks if the player is where an obsticle is
 			for (Obstacle obsticle : obstacles) {
 				if (player.position.equals(obsticle.position)) {
-					gameOver(player.score);
+					gameOver();
 					break;
 				}
 			}
@@ -130,7 +133,7 @@ public class GwtUltra implements EntryPoint {
 		if ((player.direction.x != 0) || (player.direction.y != 0)) {
 			hunter.move();
 			if (player.position.equals(hunter.position)) {
-				gameOver(player.score);
+				gameOver();
 			}
 		}
 	}
@@ -149,9 +152,12 @@ public class GwtUltra implements EntryPoint {
 		obstacles.add(new Obstacle(new Vector(target.position), this));
 	}
 
-	private void gameOver(Integer score) {
+	public void gameOver() {
 		player.setDirection(new Vector(0, 0));
 		timer.cancel();
+		humanPlayer.addTimePlayed(roundTime);
+		humanPlayer.gamePlayed();
+		rpcHelper.gamePlayed(humanPlayer, this);
 		if (player.score > highScore && humanPlayer != null) {
 			highScore = player.score;
 			if (speed == HIGH_SPEED && !isRepeatingMode && !isWrappingMode && !isChaseMode) {
@@ -163,10 +169,10 @@ public class GwtUltra implements EntryPoint {
 			} else if (!isRepeatingMode && isChaseMode) {
 				humanPlayer.setChaseHighScore(highScore);
 				rpcHelper.setNewHighScore(humanPlayer, this);
-			} else highScore = 0;
-			graphics.setHighScore(highScore);
+			}
 			rpcHelper.getTop10HighScores(this);
 		}
+		updateHighScore();
 		graphics.gameOver();
 	}
 
@@ -189,6 +195,9 @@ public class GwtUltra implements EntryPoint {
 				Vector nextTargetPosition = sequentialTargetPositions
 						.get(targetNumber - 1);
 				target = new Target(nextTargetPosition, this);
+				if(isChaseMode) {
+					hunter.getHunterDeadSquares().add(nextTargetPosition);
+				}
 			} else {
 				// Creates a new target in an unoccupied space
 				Boolean newTargetPositionIsUnoccupied = false;
@@ -214,8 +223,9 @@ public class GwtUltra implements EntryPoint {
 					}
 				}
 				target = new Target(newTargetPosition, this);
-				if(isChaseMode)
+				if(isChaseMode) {
 					hunter.getHunterDeadSquares().add(newTargetPosition);
+				}
 				if (isRepeatingMode) {
 					sequentialTargetPositions.add(target.position);
 				}
@@ -246,7 +256,7 @@ public class GwtUltra implements EntryPoint {
 	}
 	
 	public void setSpeed(int speed) {
-		this.speed = speed;
+		this.speed = (speed * 20 + 100);
 	}
 
 	public Player getPlayer() {
@@ -282,11 +292,6 @@ public class GwtUltra implements EntryPoint {
 			case WRAPPING: isWrappingMode = !isWrappingMode;
 						   updateHighScore();
 						   break;
-			
-			case SPEED: if (speed == LOW_SPEED) speed = HIGH_SPEED;
-						if (speed == HIGH_SPEED) speed = LOW_SPEED;
-						updateHighScore();
-					    break;
 						
 			case REPEATING: if (isRepeatingMode) {
 								sequentialTargetPositions.clear();
@@ -305,25 +310,6 @@ public class GwtUltra implements EntryPoint {
 						startNewRound();
 						break;
 				
-		}
-	}
-	
-	public void changeSpeed(Speed mode) {
-		switch (mode) {
-			case HIGH: speed = HIGH_SPEED;
-			GWT.log("set High Speed");
-					   timer.scheduleRepeating(speed);
-					   break;
-			
-			case MED: speed = MED_SPEED;
-			GWT.log("set Med Speed");
-					  timer.scheduleRepeating(speed);
-					  break;
-						
-			case LOW: speed = LOW_SPEED;
-			GWT.log("set Low Speed");
-					  timer.scheduleRepeating(speed);
-			   		  break;
 		}
 	}
 	
@@ -358,5 +344,13 @@ public class GwtUltra implements EntryPoint {
 	
 	public Map<String, List<HumanPlayer>> getTop10HighScores() {
 		return this.top10HighScores;
+	}
+	
+	public void pause() {
+		if (isPaused) {
+			timer.scheduleRepeating(speed);
+		} else {
+			timer.cancel();
+		}
 	}
 }
