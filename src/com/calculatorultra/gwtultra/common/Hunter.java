@@ -1,8 +1,8 @@
-package com.calculatorultra.gwtultra.client;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.DOWN_VECTOR;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.LEFT_VECTOR;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.RIGHT_VECTOR;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.UP_VECTOR;
+package com.calculatorultra.gwtultra.common;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.DOWN_VECTOR;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.LEFT_VECTOR;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.RIGHT_VECTOR;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.UP_VECTOR;
 
 import java.util.ArrayList;
 

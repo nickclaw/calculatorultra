@@ -1,4 +1,4 @@
-package com.calculatorultra.gwtultra.client;
+package com.calculatorultra.gwtultra.common;
 
 import java.util.List;
 import java.util.Map;

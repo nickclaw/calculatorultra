@@ -1,4 +1,4 @@
-package com.calculatorultra.gwtultra.client;
+package com.calculatorultra.gwtultra.common;
 
 import com.google.gwt.user.client.ui.Widget;
 

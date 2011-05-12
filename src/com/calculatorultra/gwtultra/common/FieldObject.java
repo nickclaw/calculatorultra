@@ -1,4 +1,4 @@
-package com.calculatorultra.gwtultra.client;
+package com.calculatorultra.gwtultra.common;
 
 import com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngine;
 import com.google.gwt.user.client.ui.Image;

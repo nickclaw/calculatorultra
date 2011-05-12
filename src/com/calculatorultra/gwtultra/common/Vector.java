@@ -1,4 +1,4 @@
-package com.calculatorultra.gwtultra.client;
+package com.calculatorultra.gwtultra.common;
 
 public class Vector {
 	public int x, y;

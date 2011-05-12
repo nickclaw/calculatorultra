@@ -53,10 +53,12 @@ public class AwsSimpleDBConnector {
             //sdb.createDomain(new CreateDomainRequest(myDomain));
         	
         	// Add Field
+        	/**
             String selectExpression = "select * from `" + myDomain + "`";
             SelectRequest selectRequest = new SelectRequest(selectExpression);
             for (Item item : sdb.select(selectRequest).getItems()) {
                 List<ReplaceableAttribute> replaceableAttributes = new ArrayList<ReplaceableAttribute>();
+                replaceableAttributes.add(new ReplaceableAttribute("Games", "0", true));
                 replaceableAttributes.add(new ReplaceableAttribute("Time", "0", true));
                 sdb.putAttributes(new PutAttributesRequest(myDomain, item.getName(), replaceableAttributes));
                 System.out.println(item.getName());
@@ -68,7 +70,7 @@ public class AwsSimpleDBConnector {
             }
             System.out.println();
             
-            /**
+            
             // Create a domain
             System.out.println("Creating domain called " + myDomain + ".\n");
             sdb.createDomain(new CreateDomainRequest(myDomain));
@@ -269,6 +271,8 @@ public class AwsSimpleDBConnector {
             		newHumanPlayer.setChaseHighScore(new Integer(attribute.getValue()));
             	} else if (attribute.getName().equals("Games")) {
             		newHumanPlayer.setGamesPlayed(new Integer(attribute.getValue()));
+            	} else if (attribute.getName().equals("Time")) {
+            		newHumanPlayer.setTimePlayed(new Double(attribute.getValue()));
             	} 
             	System.out.println(attribute.getValue());
             }
@@ -284,18 +288,18 @@ public class AwsSimpleDBConnector {
     	SelectRequest selectRequest = new SelectRequest(selectExpression);
         for (Item item : sdb.select(selectRequest).getItems()) {
         	System.out.println("     Found a player named: " + name);
-        	Double gamesPlayed = new Double(0);
+        	Integer gamesPlayed = 0;
         	Double timePlayed = new Double(0);
             for (Attribute attribute : item.getAttributes()) {
             	if (attribute.getName().equals("Games")) {
-            		gamesPlayed = new Double(attribute.getValue());
+            		gamesPlayed = new Integer(attribute.getValue());
             	} else if (attribute.getName().equals("Time")) {
             		timePlayed = new Double(attribute.getValue());
             	}
             	System.out.println(attribute.getValue());
             }
             gamesPlayed++;
-            timePlayed = timePlayed + time;
+            timePlayed += time;
             List<ReplaceableAttribute> replaceableAttributes = new ArrayList<ReplaceableAttribute>();
             replaceableAttributes.add(new ReplaceableAttribute("Games", gamesPlayed.toString(), true));
         	System.out.println(gamesPlayed.toString());

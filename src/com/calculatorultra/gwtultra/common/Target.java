@@ -1,4 +1,5 @@
-package com.calculatorultra.gwtultra.client;
+package com.calculatorultra.gwtultra.common;
+
 
 public class Target extends FieldObject {
 	public int value;

@@ -8,6 +8,8 @@
   <!-- <inherits name='com.google.gwt.user.theme.standard.Standard'/>     -->
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <inherits name='com.google.gwt.user.theme.dark.Dark'/>
+  <inherits name='com.google.gwt.widgetideas.WidgetIdeas' />   
+  <inherits name='com.google.gwt.libideas.LibIdeas' />
 
   <!-- Other module inherits                                      -->
   <replace-with class="com.google.gwt.canvas.client.Canvas.CanvasElementSupportDetectedMaybe">
@@ -15,11 +17,12 @@
   </replace-with>
 
   <!-- Specify the app entry point class.                         -->
-  <entry-point class='com.calculatorultra.gwtultra.client.GwtUltra'/>
+  <entry-point class='com.calculatorultra.gwtultra.common.GwtUltra'/>
 
 
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
   <source path='shared'/>
+  <source path='common'/>
 
 </module>

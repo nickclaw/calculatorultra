@@ -21,6 +21,7 @@ public class UltraGraphicsEngineUtil {
 	//static final int PX_PER_STEP_HORIZONTAL = SPACE_WIDTH / ANNIMATION_STEPS;
 	//static final int PX_PER_STEP_VERTICAL = SPACE_HEIGHT / ANNIMATION_STEPS;
 	public static final String STYLE_BLUE_SMALL = "blueSmall";
+	public static final String STYLE_BLUE_TINY = "blueTiny";
 	public static final String STYLE_BLUE_MEDIUM = "blueMedium";
 	public static final String STYLE_BLUE_BOLD = "blueBold";
 	public static final String STYLE_BLUE_LARGE = "blueLarge";
@@ -66,6 +67,11 @@ public class UltraGraphicsEngineUtil {
 		Button button = new Button(buttonLabel);
 		button.addClickHandler(clickHandler);
 		return button;
+	}
+	
+	public static Image createImage(String imageResource) {
+		Image image = new Image(imageResource);
+		return image;
 	}
 
 	public static Label createLabelWithStyleChange(String labelText, final String style1, final String style2) {

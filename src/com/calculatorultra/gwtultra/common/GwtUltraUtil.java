@@ -1,4 +1,6 @@
-package com.calculatorultra.gwtultra.client;
+package com.calculatorultra.gwtultra.common;
+
+import com.calculatorultra.gwtultra.common.keystrokecontroller.PlayerKeystrokeController;
 
 
 public class GwtUltraUtil {
@@ -27,7 +29,7 @@ public class GwtUltraUtil {
 	public static final int S = 83;
 	public static final int D = 68;
 	public static final int N = 78;
-	public static final int P = 100;
+	public static final int P = 80;
 	public static final int LEFT_ARROW = 37;
 	public static final int RIGHT_ARROW = 39;
 	public static final int UP_ARROW = 38;
@@ -36,6 +38,17 @@ public class GwtUltraUtil {
 	public static final Vector DOWN = new Vector(0,1);
 	public static final Vector LEFT = new Vector(-1,0);
 	public static final Vector RIGHT = new Vector(1,0);
+
+	public static void setSinglePlayerControls(PlayerKeystrokeController playerKeyController) {
+		playerKeyController.addKeystroke(W, Function.UP);
+		playerKeyController.addKeystroke(UP_ARROW, Function.UP);
+		playerKeyController.addKeystroke(S, Function.DOWN);
+		playerKeyController.addKeystroke(UP_ARROW, Function.DOWN);
+		playerKeyController.addKeystroke(A, Function.LEFT);
+		playerKeyController.addKeystroke(UP_ARROW, Function.LEFT);
+		playerKeyController.addKeystroke(D, Function.RIGHT);
+		playerKeyController.addKeystroke(UP_ARROW, Function.RIGHT);
+	}
 	
 	public static enum Mode {
 		WRAPPING, SPEED, CHASE, REPEATING
@@ -43,6 +56,10 @@ public class GwtUltraUtil {
 	
 	public static enum Speed {
 		HIGH, LOW, MED
+	}
+	
+	public static enum Function {
+		UP, DOWN, LEFT, RIGHT, PAUSE, NEW_GAME, MOVE_TARGET
 	}
 	
 }

@@ -4,7 +4,7 @@ import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraph
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_MEDIUM_CURSOR;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createLabelWithStyleChangeAndClickHandler;
 
-import com.calculatorultra.gwtultra.client.Vector;
+import com.calculatorultra.gwtultra.common.Vector;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.DialogBox;

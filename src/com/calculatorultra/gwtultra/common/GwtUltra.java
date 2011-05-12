@@ -1,24 +1,36 @@
-package com.calculatorultra.gwtultra.client;
+package com.calculatorultra.gwtultra.common;
 
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.HEIGHT_SPACES;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.HIGH_SPEED;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.WIDTH_SPACES;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.HEIGHT_SPACES;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.HIGH_SPEED;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.WIDTH_SPACES;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.setSinglePlayerControls;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode;
 import com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngine;
+import com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineIE;
+import com.calculatorultra.gwtultra.common.GwtUltraUtil.Mode;
+import com.calculatorultra.gwtultra.common.exception.IncorrectNameException;
+import com.calculatorultra.gwtultra.common.exception.IncorrectPasswordException;
+import com.calculatorultra.gwtultra.common.exception.NotUniqueNameException;
+import com.calculatorultra.gwtultra.common.exception.SignInException;
+import com.calculatorultra.gwtultra.common.keystrokecontroller.KeystrokeController;
+import com.calculatorultra.gwtultra.common.keystrokecontroller.KeystrokeEvent;
+import com.calculatorultra.gwtultra.common.keystrokecontroller.KeystrokeHandler;
+import com.calculatorultra.gwtultra.common.keystrokecontroller.OptionsKeystrokeController;
+import com.calculatorultra.gwtultra.common.keystrokecontroller.PlayerKeystrokeController;
 import com.calculatorultra.gwtultra.shared.HumanPlayer;
+import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 
-public class GwtUltra implements EntryPoint {
+public class GwtUltra extends UltraRpcCaller implements EntryPoint, KeystrokeHandler {
 	private int speed = HIGH_SPEED;
 	private int highScore = 0;
-	private final UltraGraphicsEngine graphics = new UltraGraphicsEngine(this);
+	private UltraGraphicsEngine graphics;
 	private final ArrayList<Obstacle> obstacles = new ArrayList<Obstacle>();
 	private final ArrayList<Vector> sequentialTargetPositions = new ArrayList<Vector>();
 	private boolean isRepeatingMode = false;
@@ -27,13 +39,15 @@ public class GwtUltra implements EntryPoint {
 	private int targetNumber = 0;
 	private int targetMoves = 0;
 	private Player player;
+	private final List<KeystrokeController> keystrokeControllers = new ArrayList<KeystrokeController>();
+	private final PlayerKeystrokeController player1KeyController = new PlayerKeystrokeController(this);
+	private final OptionsKeystrokeController optionsKeyController = new OptionsKeystrokeController(this);
 	private Target target;
 	private Hunter hunter;
 	private HumanPlayer humanPlayer;
 	private double roundTime = 0;
-	private final boolean isPaused = false;
+	private boolean isPaused = false;
 	private Map<String, List<HumanPlayer>> top10HighScores;
-	RpcHelper rpcHelper = new RpcHelper();
 	private final Timer timer = new Timer() {
 		@Override
 		public void run() {
@@ -42,7 +56,7 @@ public class GwtUltra implements EntryPoint {
 				moveHunter();
 			}
 			graphics.repaint();
-			if (player.direction.equals(new Vector(0,0))) {
+			if (!player.direction.equals(new Vector(0, 0))) {
 				roundTime += speed;
 			}
 		}
@@ -51,9 +65,15 @@ public class GwtUltra implements EntryPoint {
 	@Override
 	public void onModuleLoad() {
 		GWT.log("starting");
+		if (Canvas.isSupported()) {
+			graphics = new UltraGraphicsEngine(this);
+		} else {
+			graphics = new UltraGraphicsEngineIE(this);
+		}
+		setSinglePlayerControls(player1KeyController);
 		graphics.setupGame();
 		startNewRound();
-		rpcHelper.getTop10HighScores(this);
+		getTop10HighScores();
 
 	}
 
@@ -68,7 +88,8 @@ public class GwtUltra implements EntryPoint {
 		} else {
 			startPosition = newRandomVector();
 		}
-		player = new Player(startPosition, this);
+		player = new Player(startPosition, this, 1);
+		player1KeyController.setPlayer(player);
 		if (isChaseMode) {
 			hunter = new Hunter(new Vector(WIDTH_SPACES - startPosition.x - 1,
 					HEIGHT_SPACES - startPosition.y - 1), player, target, this);
@@ -155,22 +176,26 @@ public class GwtUltra implements EntryPoint {
 	public void gameOver() {
 		player.setDirection(new Vector(0, 0));
 		timer.cancel();
-		humanPlayer.addTimePlayed(roundTime);
-		humanPlayer.gamePlayed();
-		rpcHelper.gamePlayed(humanPlayer, this);
-		if (player.score > highScore && humanPlayer != null) {
-			highScore = player.score;
-			if (speed == HIGH_SPEED && !isRepeatingMode && !isWrappingMode && !isChaseMode) {
-				humanPlayer.setNormalHighScore(highScore);
-				rpcHelper.setNewHighScore(humanPlayer, this);
-			} else if (speed == HIGH_SPEED && !isRepeatingMode && isWrappingMode && !isChaseMode) {
-				humanPlayer.setWrappingHighScore(highScore);
-				rpcHelper.setNewHighScore(humanPlayer, this);
-			} else if (!isRepeatingMode && isChaseMode) {
-				humanPlayer.setChaseHighScore(highScore);
-				rpcHelper.setNewHighScore(humanPlayer, this);
+		if ((humanPlayer != null) && (player.score > 0)) {
+			humanPlayer.addTimePlayed(roundTime);
+			humanPlayer.gamePlayed();
+			gamePlayed(humanPlayer.getName(), roundTime);
+			if (player.score > highScore) {
+				highScore = player.score;
+				if ((speed == HIGH_SPEED) && !isRepeatingMode
+						&& !isWrappingMode && !isChaseMode) {
+					humanPlayer.setNormalHighScore(highScore);
+					setNewHighScore(humanPlayer);
+				} else if ((speed == HIGH_SPEED) && !isRepeatingMode
+						&& isWrappingMode && !isChaseMode) {
+					humanPlayer.setWrappingHighScore(highScore);
+					setNewHighScore(humanPlayer);
+				} else if (!isRepeatingMode && isChaseMode) {
+					humanPlayer.setChaseHighScore(highScore);
+					setNewHighScore(humanPlayer);
+				}
+				getTop10HighScores();
 			}
-			rpcHelper.getTop10HighScores(this);
 		}
 		updateHighScore();
 		graphics.gameOver();
@@ -183,7 +208,8 @@ public class GwtUltra implements EntryPoint {
 			newObsticle();
 			newTarget();
 			targetMoves++;
-			graphics.setRemainingTargetMoves((5 + player.score / 10) - targetMoves);
+			graphics.setRemainingTargetMoves((5 + player.score / 10)
+					- targetMoves);
 		}
 	}
 
@@ -195,7 +221,7 @@ public class GwtUltra implements EntryPoint {
 				Vector nextTargetPosition = sequentialTargetPositions
 						.get(targetNumber - 1);
 				target = new Target(nextTargetPosition, this);
-				if(isChaseMode) {
+				if (isChaseMode) {
 					hunter.getHunterDeadSquares().add(nextTargetPosition);
 				}
 			} else {
@@ -209,7 +235,8 @@ public class GwtUltra implements EntryPoint {
 					// Checks if the new position is where the player is
 					if (player.position.equals(newTargetPosition)) {
 						newTargetPositionIsUnoccupied = false;
-					} else if (hunter != null && newTargetPosition.equals(hunter.position)) {
+					} else if ((hunter != null)
+							&& newTargetPosition.equals(hunter.position)) {
 						newTargetPositionIsUnoccupied = false;
 					} else {
 						// Checks if the new position is where any of the
@@ -223,7 +250,7 @@ public class GwtUltra implements EntryPoint {
 					}
 				}
 				target = new Target(newTargetPosition, this);
-				if(isChaseMode) {
+				if (isChaseMode) {
 					hunter.getHunterDeadSquares().add(newTargetPosition);
 				}
 				if (isRepeatingMode) {
@@ -232,7 +259,8 @@ public class GwtUltra implements EntryPoint {
 			}
 		}
 	}
-	
+
+	@Override
 	public void successfulSignIn(HumanPlayer humanPlayer) {
 		this.humanPlayer = humanPlayer;
 		graphics.successfulSignIn();
@@ -242,21 +270,15 @@ public class GwtUltra implements EntryPoint {
 	public HumanPlayer getHumanPlayer() {
 		return humanPlayer;
 	}
-	
-	public void registerPlayer(String name, String password) {
-		rpcHelper.registerPlayer(name, password, this);
-	}
-	
-	public void signIn(String name, String password) {
-		rpcHelper.signIn(name, password, this);
-	}
 
 	public int getSpeed() {
 		return speed;
 	}
-	
+
 	public void setSpeed(int speed) {
 		this.speed = (speed * 20 + 100);
+		player.score = 0;
+		gameOver();
 	}
 
 	public Player getPlayer() {
@@ -274,7 +296,7 @@ public class GwtUltra implements EntryPoint {
 	public ArrayList<Obstacle> getObstacles() {
 		return obstacles;
 	}
-	
+
 	public boolean isRepeatingMode() {
 		return isRepeatingMode;
 	}
@@ -286,39 +308,44 @@ public class GwtUltra implements EntryPoint {
 	public boolean isChaseMode() {
 		return isChaseMode;
 	}
-	
+
 	public void changeMode(Mode mode) {
 		switch (mode) {
-			case WRAPPING: isWrappingMode = !isWrappingMode;
-						   updateHighScore();
-						   break;
-						
-			case REPEATING: if (isRepeatingMode) {
-								sequentialTargetPositions.clear();
-							} else {
-								for (Obstacle obsticle : obstacles) {
-									sequentialTargetPositions.add(obsticle.position);
-								}
-								sequentialTargetPositions.add(target.position);
-							}
-							isRepeatingMode = !isRepeatingMode;
-							updateHighScore();
-						    break;
-							   
-			case CHASE: isChaseMode = !isChaseMode;
-						updateHighScore();
-						startNewRound();
-						break;
-				
+		case WRAPPING:
+			isWrappingMode = !isWrappingMode;
+			updateHighScore();
+			break;
+
+		case REPEATING:
+			if (isRepeatingMode) {
+				sequentialTargetPositions.clear();
+			} else {
+				for (Obstacle obsticle : obstacles) {
+					sequentialTargetPositions.add(obsticle.position);
+				}
+				sequentialTargetPositions.add(target.position);
+			}
+			isRepeatingMode = !isRepeatingMode;
+			updateHighScore();
+			break;
+
+		case CHASE:
+			isChaseMode = !isChaseMode;
+			updateHighScore();
+			startNewRound();
+			break;
+
 		}
 	}
-	
+
 	private void updateHighScore() {
 		highScore = 0;
 		if (humanPlayer != null) {
-			if (speed == HIGH_SPEED && !isRepeatingMode && !isWrappingMode && !isChaseMode) {
+			if ((speed == HIGH_SPEED) && !isRepeatingMode && !isWrappingMode
+					&& !isChaseMode) {
 				highScore = humanPlayer.getNormalHighScore();
-			} else if (speed == HIGH_SPEED && !isRepeatingMode && isWrappingMode && !isChaseMode) {
+			} else if ((speed == HIGH_SPEED) && !isRepeatingMode
+					&& isWrappingMode && !isChaseMode) {
 				highScore = humanPlayer.getWrappingHighScore();
 			} else if (!isRepeatingMode && isChaseMode) {
 				highScore = humanPlayer.getChaseHighScore();
@@ -330,27 +357,54 @@ public class GwtUltra implements EntryPoint {
 	private float calculateAveragePoints() {
 		// Determines the Average Point Value (APV) received of each target
 		if (obstacles.size() > 0) { // Prevents Divide by 0!
-			float averagePoints = (float) (player.score)
-					/ (float) (obstacles.size());
+			float averagePoints = (float) (player.score)/ (float) (obstacles.size());
 			return averagePoints;
 		} else {
 			return 0;
 		}
 	}
-	
-	public void setTop10HighScores(Map<String, List<HumanPlayer>> top10HighScores) {
+
+	@Override
+	protected void setTop10HighScores(Map<String, List<HumanPlayer>> top10HighScores) {
 		this.top10HighScores = top10HighScores;
 	}
-	
-	public Map<String, List<HumanPlayer>> getTop10HighScores() {
+
+	public Map<String, List<HumanPlayer>> getHighScores() {
 		return this.top10HighScores;
 	}
-	
+
 	public void pause() {
 		if (isPaused) {
 			timer.scheduleRepeating(speed);
 		} else {
 			timer.cancel();
+		}
+		isPaused = !isPaused;
+	}
+
+	@Override
+	public void onKeystroke(KeystrokeEvent event) {
+		for (KeystrokeController keystrokeController : keystrokeControllers) {
+			if(keystrokeController.getKeystrokes().containsKey(event.getKeystroke())) {
+				keystrokeController.onKeystroke(event.getKeystroke());
+			}
+		}
+
+	}
+
+	@Override
+	public void registerKeystrokeController(KeystrokeController keyController) {
+		keystrokeControllers.add(keyController);
+	}
+
+	@Override
+	protected void unsuccessfulSignIn(SignInException signInException) {
+		if (signInException.getClass().equals(IncorrectPasswordException.class)) {
+			graphics.incorrectPassword();
+		} else if (signInException.getClass().equals(IncorrectNameException.class)) {
+			graphics.incorrectName();
+		} else if (signInException.getClass().equals(NotUniqueNameException.class)) {
+			graphics.notUniqueName();
 		}
 	}
 }

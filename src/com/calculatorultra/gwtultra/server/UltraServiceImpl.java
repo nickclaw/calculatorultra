@@ -11,7 +11,7 @@ import java.util.Map;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
-import com.calculatorultra.gwtultra.client.UltraService;
+import com.calculatorultra.gwtultra.common.UltraService;
 import com.calculatorultra.gwtultra.shared.HumanPlayer;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 

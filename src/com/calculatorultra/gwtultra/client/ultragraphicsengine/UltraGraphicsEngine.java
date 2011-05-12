@@ -1,27 +1,5 @@
 package com.calculatorultra.gwtultra.client.ultragraphicsengine;
 
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.A;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.D;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.DOWN;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.DOWN_ARROW;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.E;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.HEIGHT_SPACES;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.LEFT;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.LEFT_ARROW;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.N;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.P;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.RIGHT;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.RIGHT_ARROW;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.S;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.SPACE_BAR;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.UP;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.UP_ARROW;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.W;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.WIDTH_SPACES;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.ZERO;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode.CHASE;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode.REPEATING;
-import static com.calculatorultra.gwtultra.client.GwtUltraUtil.Mode.WRAPPING;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.BACKGROUND;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.FIELD_OFFSET_X;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.FIELD_OFFSET_Y;
@@ -32,37 +10,42 @@ import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraph
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.RESET_OVERLAY;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.SPACE_HEIGHT;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.SPACE_WIDTH;
-import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.SPEED_SLIDER;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_BLUE_LARGE;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_BLUE_SMALL;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_BLUE_SMALL_CURSOR;
+import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_BLUE_TINY;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_BOLD;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_LARGE_CURSOR;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_MEDIUM;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_GREY_SMALL_CURSOR;
-import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.STYLE_OPACITY_40;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.TARGET;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.TONEY_IS_ANGRY;
+import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createImage;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createImageWithClickHandler;
-import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createImageWithStyle;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createLabelWithStyle;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createLabelWithStyleAndClickHandler;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.createLabelWithStyleChangeAndClickHandler;
 import static com.calculatorultra.gwtultra.client.ultragraphicsengine.UltraGraphicsEngineUtil.setTextAndStyle;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.HEIGHT_SPACES;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.WIDTH_SPACES;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.Mode.CHASE;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.Mode.REPEATING;
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.Mode.WRAPPING;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.calculatorultra.gwtultra.client.FieldObject;
-import com.calculatorultra.gwtultra.client.GraphicsObject;
-import com.calculatorultra.gwtultra.client.GwtUltra;
-import com.calculatorultra.gwtultra.client.Hunter;
-import com.calculatorultra.gwtultra.client.Obstacle;
-import com.calculatorultra.gwtultra.client.Player;
-import com.calculatorultra.gwtultra.client.Target;
-import com.calculatorultra.gwtultra.client.Vector;
+import com.calculatorultra.gwtultra.common.FieldObject;
+import com.calculatorultra.gwtultra.common.GraphicsObject;
+import com.calculatorultra.gwtultra.common.GwtUltra;
+import com.calculatorultra.gwtultra.common.Hunter;
+import com.calculatorultra.gwtultra.common.Obstacle;
+import com.calculatorultra.gwtultra.common.Player;
+import com.calculatorultra.gwtultra.common.Target;
+import com.calculatorultra.gwtultra.common.Vector;
+import com.calculatorultra.gwtultra.common.keystrokecontroller.KeystrokeEvent;
 import com.calculatorultra.gwtultra.shared.HumanPlayer;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -72,17 +55,11 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
-import com.google.gwt.event.dom.client.MouseMoveEvent;
-import com.google.gwt.event.dom.client.MouseMoveHandler;
-import com.google.gwt.event.dom.client.MouseUpEvent;
-import com.google.gwt.event.dom.client.MouseUpHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -90,7 +67,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.widgetideas.client.SliderBar;
 
+@SuppressWarnings("deprecation")
 public class UltraGraphicsEngine implements ClickHandler {
 	
 	private final GraphicsObject<Canvas> canvas = new GraphicsObject<Canvas>(Canvas.createIfSupported(), new Vector(0,0));
@@ -104,54 +84,54 @@ public class UltraGraphicsEngine implements ClickHandler {
 	static final int MIDDLE_ROW_Y = 494;
 	static final int BOTTOM_ROW_Y = 512;
 	private final Vector scoreLabelPosition = new Vector(624, TOP_ROW_Y);
-	private final GraphicsObject<Label> scoreLabel = new GraphicsObject<Label> (createLabelWithStyle("Score", STYLE_BLUE_SMALL), scoreLabelPosition);
+	protected final GraphicsObject<Label> scoreLabel = new GraphicsObject<Label> (createLabelWithStyle("Score", STYLE_BLUE_SMALL), scoreLabelPosition);
 	private final Vector highScoreLabelPosition = new Vector(624, BOTTOM_ROW_Y);
-	private final GraphicsObject<Label> highScoreLabel = new GraphicsObject<Label> (createLabelWithStyle("High Score", STYLE_BLUE_SMALL), highScoreLabelPosition);
+	protected final GraphicsObject<Label> highScoreLabel = new GraphicsObject<Label> (createLabelWithStyle("High Score", STYLE_BLUE_SMALL), highScoreLabelPosition);
 	private final Vector scoreValueLabelPosition = new Vector(712, TOP_ROW_Y);
-	private final GraphicsObject<Label> scoreValueLabel = new GraphicsObject<Label> (createLabelWithStyle("0000", STYLE_BLUE_SMALL), scoreValueLabelPosition);
+	protected final GraphicsObject<Label> scoreValueLabel = new GraphicsObject<Label> (createLabelWithStyle("0000", STYLE_BLUE_SMALL), scoreValueLabelPosition);
 	private final Vector highScoreValueLabelPosition = new Vector(712, BOTTOM_ROW_Y);
-	private final GraphicsObject<Label> highScoreValueLabel = new GraphicsObject<Label> (createLabelWithStyle("0000", STYLE_BLUE_SMALL), highScoreValueLabelPosition);
+	protected final GraphicsObject<Label> highScoreValueLabel = new GraphicsObject<Label> (createLabelWithStyle("0000", STYLE_BLUE_SMALL), highScoreValueLabelPosition);
 	private final Vector ageragePointsLabelPosition = new Vector(749, TOP_ROW_Y);
-	private final GraphicsObject<Label> averagePointsLabel = new GraphicsObject<Label> (createLabelWithStyle("Average", STYLE_BLUE_SMALL), ageragePointsLabelPosition);
+	protected final GraphicsObject<Label> averagePointsLabel = new GraphicsObject<Label> (createLabelWithStyle("Average", STYLE_BLUE_SMALL), ageragePointsLabelPosition);
 	private final Vector remainingTargetMovesLabelPosition = new Vector(749, BOTTOM_ROW_Y);
-	private final GraphicsObject<Label> remainingTargetMovesLabel = new GraphicsObject<Label> (createLabelWithStyle("+ Moves", STYLE_BLUE_SMALL), remainingTargetMovesLabelPosition);
+	protected final GraphicsObject<Label> remainingTargetMovesLabel = new GraphicsObject<Label> (createLabelWithStyle("+ Moves", STYLE_BLUE_SMALL), remainingTargetMovesLabelPosition);
 	private final Vector averagePointsValueLabelPosition = new Vector(837, TOP_ROW_Y);
-	private final GraphicsObject<Label> averagePointsValueLabel = new GraphicsObject<Label> (createLabelWithStyle("0000", STYLE_BLUE_SMALL), averagePointsValueLabelPosition);
+	protected final GraphicsObject<Label> averagePointsValueLabel = new GraphicsObject<Label> (createLabelWithStyle("0000", STYLE_BLUE_SMALL), averagePointsValueLabelPosition);
 	private final Vector remainingTargetMovesValueLabelPosition = new Vector(837, BOTTOM_ROW_Y);
-	private final GraphicsObject<Label> remainingTargetMovesValueLabel = new GraphicsObject<Label> (createLabelWithStyle("0000", STYLE_BLUE_SMALL), remainingTargetMovesValueLabelPosition);
+	protected final GraphicsObject<Label> remainingTargetMovesValueLabel = new GraphicsObject<Label> (createLabelWithStyle("0000", STYLE_BLUE_SMALL), remainingTargetMovesValueLabelPosition);
 	private final Vector wrappingLabelPosition = new Vector(581, TOP_ROW_Y);
-	private final GraphicsObject<Label> wrappingLabel = new GraphicsObject<Label> (createLabelWithStyleAndClickHandler("Wrap", STYLE_BLUE_SMALL_CURSOR, this), wrappingLabelPosition);
+	protected final GraphicsObject<Label> wrappingLabel = new GraphicsObject<Label> (createLabelWithStyleAndClickHandler("Wrap", STYLE_BLUE_SMALL_CURSOR, this), wrappingLabelPosition);
 	private final Vector chaseLabelPosition = new Vector(528, TOP_ROW_Y);
-	private final GraphicsObject<Label> chaseLabel = new GraphicsObject<Label> (createLabelWithStyleAndClickHandler("Chase", STYLE_BLUE_SMALL_CURSOR, this), chaseLabelPosition);
+	protected final GraphicsObject<Label> chaseLabel = new GraphicsObject<Label> (createLabelWithStyleAndClickHandler("Chase", STYLE_BLUE_SMALL_CURSOR, this), chaseLabelPosition);
 	private final Vector repeatingLabelPosition = new Vector(473, TOP_ROW_Y);
-	private final GraphicsObject<Label> repeatingLabel = new GraphicsObject<Label> (createLabelWithStyleAndClickHandler("Repeat", STYLE_BLUE_SMALL_CURSOR, this), repeatingLabelPosition);
-	private final Vector speedLabelPosition = new Vector(580, 530);
-	private final GraphicsObject<Label> speedLabel = new GraphicsObject<Label> (createLabelWithStyleAndClickHandler("High", STYLE_GREY_SMALL_CURSOR, this), speedLabelPosition);
-	private final GraphicsObject<Image> resetImage = new GraphicsObject<Image> (createImageWithClickHandler(RESET_OVERLAY, this), new Vector(FIELD_OFFSET_X, FIELD_OFFSET_Y));
-	private final GraphicsObject<Image> background = new GraphicsObject<Image> (createImageWithStyle(BACKGROUND, STYLE_OPACITY_40), new Vector(0, 0));
-	private final GraphicsObject<Image> speedSlider = new GraphicsObject<Image> (createImageWithStyle(SPEED_SLIDER, STYLE_OPACITY_40), new Vector(580, 512));
-	private GraphicsObject<Image> hitCounter;
+	protected final GraphicsObject<Label> repeatingLabel = new GraphicsObject<Label> (createLabelWithStyleAndClickHandler("Repeat", STYLE_BLUE_SMALL_CURSOR, this), repeatingLabelPosition);
+	private final Vector highSpeedLabelPosition = new Vector(590, 509);
+	protected final GraphicsObject<Label> highSpeedLabel = new GraphicsObject<Label> (createLabelWithStyle("High", STYLE_BLUE_TINY), highSpeedLabelPosition);
+	private final Vector lowSpeedLabelPosition = new Vector(480, 509);
+	protected final GraphicsObject<Label> lowSpeedLabel = new GraphicsObject<Label> (createLabelWithStyle("Low", STYLE_BLUE_TINY), lowSpeedLabelPosition);
+	protected final GraphicsObject<Image> resetImage = new GraphicsObject<Image> (createImageWithClickHandler(RESET_OVERLAY, this), new Vector(FIELD_OFFSET_X, FIELD_OFFSET_Y));
+	protected final GraphicsObject<Image> background = new GraphicsObject<Image> (createImage(BACKGROUND), new Vector(0, 0));
+	protected GraphicsObject<Image> hitCounter;
 	private final Vector signInLabelPosition = new Vector(82, MIDDLE_ROW_Y);
-	private final GraphicsObject<Label> signInLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Sign In", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), signInLabelPosition);
+	protected final GraphicsObject<Label> signInLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Sign In", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), signInLabelPosition);
 	private final Vector instructionsLabelPosition = new Vector(298, MIDDLE_ROW_Y);
-	private final GraphicsObject<Label> instructionsLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Instructions", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), instructionsLabelPosition);
+	protected final GraphicsObject<Label> instructionsLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Instructions", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), instructionsLabelPosition);
 	private final Vector leaderboardLabelPosition = new Vector(190, MIDDLE_ROW_Y);
-	private final GraphicsObject<Label> leaderboardLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Stats", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), leaderboardLabelPosition);
-	private final FocusPanel focusPanel = new FocusPanel();
-	private final AbsolutePanel absPanel = new AbsolutePanel();
-	private final GwtUltra gwtUltra;
-	private final ArrayList<GraphicsObject<?>> graphicsObjects = new ArrayList<GraphicsObject<?>>();
-	private final ArrayList<FieldObject> fieldObjects = new ArrayList<FieldObject>();
+	protected final GraphicsObject<Label> leaderboardLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Stats", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), leaderboardLabelPosition);
+	protected final FocusPanel focusPanel = new FocusPanel();
+	protected final AbsolutePanel absPanel = new AbsolutePanel();
+	final GwtUltra gwtUltra;
+	protected final ArrayList<GraphicsObject<?>> graphicsObjects = new ArrayList<GraphicsObject<?>>();
+	protected final ArrayList<FieldObject> fieldObjects = new ArrayList<FieldObject>();
 	private final Vector signInDialogBoxPosition = new Vector(67, 323);
 	private final SignInDialogBox signInDialogBox = new SignInDialogBox(this, signInDialogBoxPosition);
 	private final Vector instructionsDialogBoxPosition = new Vector(70, 70);
 	private final InstructionsDialogBox instructionsDialogBox = new InstructionsDialogBox(this, instructionsDialogBoxPosition);
 	private final Vector leaderboardDialogBoxPosition = new Vector(70, 70);
 	private LeaderboardDialogBox leaderboardDialogBox;
-	private boolean isToneysFace = false;
-	private MouseMoveHandler mouseMoveHandler;
-	private HandlerRegistration mouseMoveHandlerRegistration;
-	private HandlerRegistration mouseUpHandlerRegistration;
+	protected boolean isToneysFace = false;
+	private final Vector sliderBarPosition = new Vector(473, 512);
+	protected final GraphicsObject<SliderBar> sliderBar = new GraphicsObject<SliderBar> (new SliderBar(0, 10), sliderBarPosition);
 	public UltraGraphicsEngine(GwtUltra gwtUltra) {
 		this.gwtUltra = gwtUltra;
 	}
@@ -161,6 +141,20 @@ public class UltraGraphicsEngine implements ClickHandler {
 	}
 
 	public void setupGame() {
+		
+		final SliderBar slider = sliderBar.getWidget();
+		slider.setStepSize(1);
+		slider.setCurrentValue(10);
+		slider.setNumTicks(0);
+		slider.setNumLabels(0);
+		slider.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void onChange(Widget sender) {
+				gwtUltra.setSpeed((int) (10 - slider.getCurrentValue()));
+			}
+		});
+		
 		
         canvas.getWidget().setStyleName("mainCanvas");
         canvas.getWidget().setWidth(CANVAS_WIDTH + "px");
@@ -174,46 +168,31 @@ public class UltraGraphicsEngine implements ClickHandler {
 		focusPanel.setStyleName("ultraGraphicsEngine");
 		focusPanel.setFocus(true);
 		focusPanel.addClickHandler(this);
-		setupSpeedSlider();
+		//setupSpeedSlider();
 		focusPanel.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				event.preventDefault();
 				Integer key = event.getNativeKeyCode();
 				GWT.log(key.toString());
-				switch (key) {
-				case W:
-				case UP_ARROW:
-					gwtUltra.getPlayer().setDirection(UP);
-					break;
-				case A:
-				case LEFT_ARROW:
-					gwtUltra.getPlayer().setDirection(LEFT);
-					break;
-				case S:
-				case DOWN_ARROW:
-					gwtUltra.getPlayer().setDirection(DOWN);
-					break;
-				case D:
-				case RIGHT_ARROW:
-					gwtUltra.getPlayer().setDirection(RIGHT);
-					break;
-				case E:
-				case ZERO:
-					gwtUltra.moveTarget();
-					break;
-				case N:
-				case SPACE_BAR:
-					gwtUltra.startNewRound();
-					break;
-				case P:
-					gwtUltra.pause();
-					break;
-				}
+				gwtUltra.onKeystroke(new KeystrokeEvent(this, key));
 			}
 		});
 		rootPanel.add(focusPanel);
 		
+		setUpGraphicsObjectList();
+		
+		focusPanel.add(absPanel);
+		absPanel.setSize("939px", "1000px");
+
+		setHighScore(0);
+		
+		Window.enableScrolling(false);
+		Window.setTitle("Ultra");
+
+	}
+
+	public void setUpGraphicsObjectList() {
 		//Add all the GraphicsObjects to the ArrayList
 		graphicsObjects.add(canvas);
 		graphicsObjects.add(scoreLabel);
@@ -231,55 +210,12 @@ public class UltraGraphicsEngine implements ClickHandler {
 		graphicsObjects.add(signInLabel);
 		graphicsObjects.add(leaderboardLabel);
 		graphicsObjects.add(instructionsLabel);
+		graphicsObjects.add(highSpeedLabel);
+		graphicsObjects.add(lowSpeedLabel);
+		graphicsObjects.add(sliderBar);
 		graphicsObjects.add(wrappingLabel);
 		graphicsObjects.add(chaseLabel);
 		graphicsObjects.add(repeatingLabel);
-		//graphicsObjects.add(speedLabel);
-		
-		focusPanel.add(absPanel);
-		absPanel.setSize("939px", "1000px");
-
-		setHighScore(0);
-		
-		Window.enableScrolling(false);
-		Window.setTitle("Ultra");
-
-	}
-
-	private void setupSpeedSlider() {
-		mouseMoveHandler = new MouseMoveHandler() {
-			@Override
-			public void onMouseMove(MouseMoveEvent event) {
-				if (event.getX() >= 471 && event.getX() <= 589) {
-					int space = ((event.getX()-480) / 20);
-					speedSlider.setXPosition(480 + 20 * space);
-					gwtUltra.setSpeed(10 - 2 * space);
-					speedLabel.getWidget().setText("Speed " + gwtUltra.getSpeed());
-				} else {
-					mouseMoveHandlerRegistration.removeHandler();
-				}
-			}
-		};
-		focusPanel.addMouseDownHandler(new MouseDownHandler() {
-			@Override
-			public void onMouseDown(MouseDownEvent event) {
-				if (speedSlider.getXPosition() <= event.getX() 
-						&& (speedSlider.getXPosition() + 20) >= event.getX()
-						&& speedSlider.getYPosition() <= event.getY()
-						&& (speedSlider.getYPosition() + 20) >= event.getY()) {
-					mouseMoveHandlerRegistration = focusPanel.addMouseMoveHandler(mouseMoveHandler);
-				}
-			}
-		});
-		
-		mouseUpHandlerRegistration = focusPanel.addMouseUpHandler(new MouseUpHandler() {
-			@Override
-			public void onMouseUp(MouseUpEvent event) {
-				mouseMoveHandlerRegistration.removeHandler();
-				gwtUltra.gameOver();
-			}
-		});
-		
 	}
 
 	public void resetField() {
@@ -297,7 +233,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 		
 	}
 
-	private void addToAbsPanel(GraphicsObject<?> object) {
+	protected void addToAbsPanel(GraphicsObject<?> object) {
 		absPanel.insert(object.getWidget(), object.getXPosition(), object.getYPosition(), graphicsObjects.indexOf(object));
 	}
 	
@@ -329,10 +265,9 @@ public class UltraGraphicsEngine implements ClickHandler {
 		//GWT.log("paint");
 		Context2d context = canvas.getWidget().getContext2d();
 		
-		context.setGlobalAlpha(gwtUltra.getSpeed() * .0033);
+		context.setGlobalAlpha(gwtUltra.getSpeed() * .0040);
 		context.drawImage(((ImageElement) (background.getWidget()).getElement().cast()), background.getXPosition(), background.getYPosition());
 		context.setGlobalAlpha(1);
-		context.drawImage(((ImageElement) (speedSlider.getWidget()).getElement().cast()), speedSlider.getXPosition(), speedSlider.getYPosition());
 		
 		for(FieldObject object : fieldObjects) {
 			if (((object.getPosition().x) < 0)
@@ -412,7 +347,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 			instructionsDialogBox.show();	
 			
 		} else if (event.getSource() == leaderboardLabel.getWidget()) {
-			leaderboardDialogBox = new LeaderboardDialogBox(this, leaderboardDialogBoxPosition, gwtUltra.getTop10HighScores(), gwtUltra.getHumanPlayer());
+			leaderboardDialogBox = new LeaderboardDialogBox(this, leaderboardDialogBoxPosition, gwtUltra.getHighScores(), gwtUltra.getHumanPlayer());
 			leaderboardDialogBox.show();
 			
 		} else if (event.getSource() == wrappingLabel.getWidget()) {
@@ -478,6 +413,16 @@ public class UltraGraphicsEngine implements ClickHandler {
 			flexTable.setText(4, 1, "Invalid Password");
 			passwordTextBox.selectAll();
 		}
+		
+		public void illegalPassword() {
+			flexTable.setText(4, 1, "Please use a different password");
+			passwordTextBox.selectAll();
+		}
+		
+		public void illegalName() {
+			flexTable.setText(4, 1, "Name must be 1-12 characters");
+			nameTextBox.selectAll();
+		}
 
 		@Override
 		void setUpFlexTable() {
@@ -490,11 +435,16 @@ public class UltraGraphicsEngine implements ClickHandler {
 			newHumanPlayerButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					if(flexTable.isCellPresent(4, 1)) flexTable.clearCell(4, 1);
-					if (!nameTextBox.getText().matches("[\\w]{1,10}")) invalidName();
-					else if (!passwordTextBox.getText().matches("[\\w]{1,10}")) invalidPassword();
-					ultraGraphicsEngine.getGwtUltra().registerPlayer(nameTextBox.getText(), passwordTextBox.getText());
-					
+					if(flexTable.isCellPresent(4, 1)) {
+						flexTable.clearCell(4, 1);
+					}
+					if (!nameTextBox.getText().matches("[\\w]{1,12}")) {
+						illegalName();
+					} else if (!passwordTextBox.getText().matches("[\\w]{1,20}")) {
+						illegalName();
+					} else {
+						ultraGraphicsEngine.getGwtUltra().registerPlayer(nameTextBox.getText(), passwordTextBox.getText());
+					}
 				}
 			});
 			
@@ -503,9 +453,9 @@ public class UltraGraphicsEngine implements ClickHandler {
 			signInButton.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					if(flexTable.isCellPresent(4, 1)) flexTable.clearCell(4, 1);
-					if (!nameTextBox.getText().matches("[\\w]{1,10}")) invalidName();
-					else if (!passwordTextBox.getText().matches("[\\w]{1,10}")) invalidPassword();
+					if(flexTable.isCellPresent(4, 1)) {
+						flexTable.clearCell(4, 1);
+					}
 					ultraGraphicsEngine.getGwtUltra().signIn(nameTextBox.getText(), passwordTextBox.getText());
 				}
 			});
@@ -552,12 +502,10 @@ public class UltraGraphicsEngine implements ClickHandler {
 		@Override
 		void setUpFlexTable() {
 			
-			Map<String, List<HumanPlayer>> top10HighScores = ultraGraphicsEngine.getGwtUltra().getTop10HighScores();
+			Map<String, List<HumanPlayer>> top10HighScores = ultraGraphicsEngine.getGwtUltra().getHighScores();
 			HumanPlayer humanPlayer = ultraGraphicsEngine.getGwtUltra().getHumanPlayer();
 			
-			if (humanPlayer == null) {
-				setTextAndStyle(flexTable, 1, 0, "Sign In to view Leaderboards", STYLE_GREY_BOLD);
-			} else if (top10HighScores != null) {
+			if (top10HighScores != null) {
 				int NORMAL_COLUMN_NAME = 0;
 				int NORMAL_COLUMN_SCORE = 1;
 				int WRAPPING_COLUMN_NAME = 2;
@@ -587,14 +535,23 @@ public class UltraGraphicsEngine implements ClickHandler {
 					setTextAndStyle(flexTable, i + 2, CHASE_COLUMN_SCORE, chaseHighScores.get(i).getChaseHighScoreString(), STYLE_GREY_MEDIUM);
 				}
 				
-				setTextAndStyle(flexTable, 12, 0, "Name", STYLE_GREY_BOLD);
-				setTextAndStyle(flexTable, 13, 0, humanPlayer.getName(), STYLE_GREY_MEDIUM);
-				setTextAndStyle(flexTable, 12, 1, "Normal", STYLE_GREY_BOLD);
-				setTextAndStyle(flexTable, 13, 1, humanPlayer.getNormalHighScoreString(), STYLE_GREY_MEDIUM);
-				setTextAndStyle(flexTable, 12, 2, "Wrapping", STYLE_GREY_BOLD);
-				setTextAndStyle(flexTable, 13, 2, humanPlayer.getWrappingHighScoreString(), STYLE_GREY_MEDIUM);
-				setTextAndStyle(flexTable, 12, 3, "Chase", STYLE_GREY_BOLD);
-				setTextAndStyle(flexTable, 13, 3, humanPlayer.getChaseHighScoreString(), STYLE_GREY_MEDIUM);
+				if (humanPlayer == null) {
+					flexTable.getFlexCellFormatter().setColSpan(12, 0, 6);
+					setTextAndStyle(flexTable, 12, 0, "Sign In to save High Scores", STYLE_GREY_BOLD);
+				} else {
+					setTextAndStyle(flexTable, 12, 0, "Name", STYLE_GREY_BOLD);
+					setTextAndStyle(flexTable, 13, 0, humanPlayer.getName(), STYLE_GREY_MEDIUM);
+					setTextAndStyle(flexTable, 12, 1, "Normal", STYLE_GREY_BOLD);
+					setTextAndStyle(flexTable, 13, 1, humanPlayer.getNormalHighScoreString(), STYLE_GREY_MEDIUM);
+					setTextAndStyle(flexTable, 12, 2, "Wrapping", STYLE_GREY_BOLD);
+					setTextAndStyle(flexTable, 13, 2, humanPlayer.getWrappingHighScoreString(), STYLE_GREY_MEDIUM);
+					setTextAndStyle(flexTable, 12, 3, "Chase", STYLE_GREY_BOLD);
+					setTextAndStyle(flexTable, 13, 3, humanPlayer.getChaseHighScoreString(), STYLE_GREY_MEDIUM);
+					setTextAndStyle(flexTable, 12, 4, "Games", STYLE_GREY_BOLD);
+					setTextAndStyle(flexTable, 13, 4, humanPlayer.getGamesPlayedString(), STYLE_GREY_MEDIUM);
+					setTextAndStyle(flexTable, 12, 5, "Time (hrs)", STYLE_GREY_BOLD);
+					setTextAndStyle(flexTable, 13, 5, NumberFormat.getFormat("0.00").format(new Double(humanPlayer.getTimePlayed() / 3600000)), STYLE_GREY_MEDIUM);
+				}
 			}
 		}
 

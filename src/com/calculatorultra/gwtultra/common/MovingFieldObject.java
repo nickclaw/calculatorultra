@@ -1,4 +1,5 @@
-package com.calculatorultra.gwtultra.client;
+package com.calculatorultra.gwtultra.common;
+
 
 public abstract class MovingFieldObject extends FieldObject{
 	protected GwtUltra gwtUltra;
