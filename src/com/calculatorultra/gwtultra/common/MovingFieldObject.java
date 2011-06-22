@@ -2,7 +2,7 @@ package com.calculatorultra.gwtultra.common;
 
 
 public abstract class MovingFieldObject extends FieldObject{
-	protected GwtUltra gwtUltra;
+	protected UltraController ultraController;
 	protected Vector startPosition;
 	protected Vector direction;
 	

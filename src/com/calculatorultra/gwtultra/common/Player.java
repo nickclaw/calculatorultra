@@ -1,10 +1,12 @@
 package com.calculatorultra.gwtultra.common;
 
+import static com.calculatorultra.gwtultra.common.GwtUltraUtil.INITIAL_TARGET_MOVES;
 
 
 public class Player extends MovingFieldObject {
-	public int score = 0;
-	private final Vector startPosition;
+	private int score = 0;
+	private int targetsMoved = 0;
+	public final Vector startPosition;
 	public int playerNumber;
 
 	// the positive Y component of the direction vector is down
@@ -13,21 +15,33 @@ public class Player extends MovingFieldObject {
 		return startPosition;
 	}
 
-	public Player(Vector startPosition, GwtUltra gwtUltra, int playerNumber) {
+	public Player(Vector startPosition, UltraController ultraController, int playerNumber) {
 		this.startPosition = new Vector(startPosition);
 		this.position = startPosition;
-		this.graphics = gwtUltra.getGraphicsEngine();
+		this.graphics = ultraController.getGraphicsEngine();
 		this.playerNumber = playerNumber;
 		graphics.addToField(this);
 		direction = new Vector(0, 0);
+	}
+	
+	public int getTargetMovesRemaining() {
+		return (INITIAL_TARGET_MOVES + score / 10) - targetsMoved;
+	}
+	
+	public void movedTarget() {
+		targetsMoved++;
 	}
 
 	public int getScore() {
 		return score;
 	}
-
+	
 	public void setScore(int score) {
 		this.score = score;
+	}
+
+	public void addToScore(int score) {
+		this.score += score;
 	}
 
 	@Override

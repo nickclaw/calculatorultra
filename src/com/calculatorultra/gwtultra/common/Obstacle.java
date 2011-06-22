@@ -4,9 +4,9 @@ package com.calculatorultra.gwtultra.common;
 
 public class Obstacle extends FieldObject {
 
-	public Obstacle(Vector position, GwtUltra gwtUltra) {
+	public Obstacle(Vector position, UltraController ultraController) {
 		this.position = position;
-		this.graphics = gwtUltra.getGraphicsEngine();
+		this.graphics = ultraController.getGraphicsEngine();
 		graphics.addToField(this);
 	}
 }

@@ -39,11 +39,11 @@ import java.util.Map;
 
 import com.calculatorultra.gwtultra.common.FieldObject;
 import com.calculatorultra.gwtultra.common.GraphicsObject;
-import com.calculatorultra.gwtultra.common.GwtUltra;
 import com.calculatorultra.gwtultra.common.Hunter;
 import com.calculatorultra.gwtultra.common.Obstacle;
 import com.calculatorultra.gwtultra.common.Player;
 import com.calculatorultra.gwtultra.common.Target;
+import com.calculatorultra.gwtultra.common.UltraController;
 import com.calculatorultra.gwtultra.common.Vector;
 import com.calculatorultra.gwtultra.common.keystrokecontroller.KeystrokeEvent;
 import com.calculatorultra.gwtultra.shared.HumanPlayer;
@@ -120,7 +120,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 	protected final GraphicsObject<Label> leaderboardLabel = new GraphicsObject<Label> (createLabelWithStyleChangeAndClickHandler("Stats", STYLE_BLUE_LARGE, STYLE_GREY_LARGE_CURSOR, this), leaderboardLabelPosition);
 	protected final FocusPanel focusPanel = new FocusPanel();
 	protected final AbsolutePanel absPanel = new AbsolutePanel();
-	final GwtUltra gwtUltra;
+	final UltraController ultraController;
 	protected final ArrayList<GraphicsObject<?>> graphicsObjects = new ArrayList<GraphicsObject<?>>();
 	protected final ArrayList<FieldObject> fieldObjects = new ArrayList<FieldObject>();
 	private final Vector signInDialogBoxPosition = new Vector(67, 323);
@@ -132,12 +132,12 @@ public class UltraGraphicsEngine implements ClickHandler {
 	protected boolean isToneysFace = false;
 	private final Vector sliderBarPosition = new Vector(473, 512);
 	protected final GraphicsObject<SliderBar> sliderBar = new GraphicsObject<SliderBar> (new SliderBar(0, 10), sliderBarPosition);
-	public UltraGraphicsEngine(GwtUltra gwtUltra) {
-		this.gwtUltra = gwtUltra;
+	public UltraGraphicsEngine(UltraController ultraController) {
+		this.ultraController = ultraController;
 	}
 
-	public GwtUltra getGwtUltra() {
-		return gwtUltra;
+	public UltraController getUltraController() {
+		return ultraController;
 	}
 
 	public void setupGame() {
@@ -151,7 +151,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 
 			@Override
 			public void onChange(Widget sender) {
-				gwtUltra.setSpeed((int) (10 - slider.getCurrentValue()));
+				ultraController.setSpeed((int) (10 - slider.getCurrentValue()));
 			}
 		});
 		
@@ -175,7 +175,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 				event.preventDefault();
 				Integer key = event.getNativeKeyCode();
 				GWT.log(key.toString());
-				gwtUltra.onKeystroke(new KeystrokeEvent(this, key));
+				ultraController.onKeystroke(new KeystrokeEvent(this, key));
 			}
 		});
 		rootPanel.add(focusPanel);
@@ -218,13 +218,17 @@ public class UltraGraphicsEngine implements ClickHandler {
 		graphicsObjects.add(repeatingLabel);
 	}
 
-	public void resetField() {
+	public void resetField(int targetMoves) {
 		absPanel.clear();
 		for (GraphicsObject<?> object : graphicsObjects) {
 			addToAbsPanel(object);
 		}
 		
 		setFocus(true);
+		
+		setScore(0);
+		setAveragePoints(0);
+		setRemainingTargetMoves(targetMoves);
 		
 		fieldObjects.clear();
 		canvas.getWidget().getContext2d().drawImage(((ImageElement) (background.getWidget()).getElement().cast()), background.getXPosition(), background.getYPosition());
@@ -265,7 +269,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 		//GWT.log("paint");
 		Context2d context = canvas.getWidget().getContext2d();
 		
-		context.setGlobalAlpha(gwtUltra.getSpeed() * .0040);
+		context.setGlobalAlpha(ultraController.getSpeed() * .0040);
 		context.drawImage(((ImageElement) (background.getWidget()).getElement().cast()), background.getXPosition(), background.getYPosition());
 		context.setGlobalAlpha(1);
 		
@@ -327,7 +331,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 	
 	public void successfulSignIn() {
 		signInDialogBox.hide();
-		gwtUltra.startNewRound();
+		ultraController.startNewRound();
 	}
 	
 	public void setFocus(boolean setFocus) {
@@ -338,7 +342,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 	public void onClick(ClickEvent event) {
 		GWT.log("click");
 		if (event.getSource() == resetImage.getWidget()) {
-			gwtUltra.startNewRound();
+			ultraController.startNewRound();
 			
 		} else if (event.getSource() == signInLabel.getWidget()) {
 			signInDialogBox.show();	
@@ -347,11 +351,11 @@ public class UltraGraphicsEngine implements ClickHandler {
 			instructionsDialogBox.show();	
 			
 		} else if (event.getSource() == leaderboardLabel.getWidget()) {
-			leaderboardDialogBox = new LeaderboardDialogBox(this, leaderboardDialogBoxPosition, gwtUltra.getHighScores(), gwtUltra.getHumanPlayer());
+			leaderboardDialogBox = new LeaderboardDialogBox(this, leaderboardDialogBoxPosition, ultraController.getHighScores(), ultraController.getHumanPlayer());
 			leaderboardDialogBox.show();
 			
 		} else if (event.getSource() == wrappingLabel.getWidget()) {
-			gwtUltra.changeMode(WRAPPING);
+			ultraController.changeMode(WRAPPING);
 			if (wrappingLabel.getWidget().getStyleName().equals(STYLE_BLUE_SMALL_CURSOR)) {
 				wrappingLabel.getWidget().setStyleName(STYLE_GREY_SMALL_CURSOR);
 			} else {
@@ -359,7 +363,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 			}
 			
 		} else if (event.getSource() == chaseLabel.getWidget()) {
-			gwtUltra.changeMode(CHASE);
+			ultraController.changeMode(CHASE);
 			if (chaseLabel.getWidget().getStyleName().equals(STYLE_BLUE_SMALL_CURSOR)) {
 				chaseLabel.getWidget().setStyleName(STYLE_GREY_SMALL_CURSOR);
 			} else {
@@ -367,7 +371,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 			}
 			
 		} else if (event.getSource() == repeatingLabel.getWidget()) {
-			gwtUltra.changeMode(REPEATING);
+			ultraController.changeMode(REPEATING);
 			if (repeatingLabel.getWidget().getStyleName().equals(STYLE_BLUE_SMALL_CURSOR)) {
 				repeatingLabel.getWidget().setStyleName(STYLE_GREY_SMALL_CURSOR);
 			} else {
@@ -376,9 +380,10 @@ public class UltraGraphicsEngine implements ClickHandler {
 		} else if (event.getSource() == focusPanel) {
 			if ((event.getX() >= 708) && (event.getX() <= 730)
 					&& (event.getY() >= 540) && (event.getY() <= 555)
-					&& gwtUltra.isChaseMode()) {
-				isToneysFace = !isToneysFace;
-				gwtUltra.startNewRound();
+					// && ultraController.isChaseMode()) 
+					) {
+				//isToneysFace = !isToneysFace;
+				ultraController.startNewRound();
 			}
 		}
 		focusPanel.setFocus(true);
@@ -443,7 +448,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 					} else if (!passwordTextBox.getText().matches("[\\w]{1,20}")) {
 						illegalName();
 					} else {
-						ultraGraphicsEngine.getGwtUltra().registerPlayer(nameTextBox.getText(), passwordTextBox.getText());
+						ultraGraphicsEngine.getUltraController().registerPlayer(nameTextBox.getText(), passwordTextBox.getText());
 					}
 				}
 			});
@@ -456,7 +461,7 @@ public class UltraGraphicsEngine implements ClickHandler {
 					if(flexTable.isCellPresent(4, 1)) {
 						flexTable.clearCell(4, 1);
 					}
-					ultraGraphicsEngine.getGwtUltra().signIn(nameTextBox.getText(), passwordTextBox.getText());
+					ultraGraphicsEngine.getUltraController().signIn(nameTextBox.getText(), passwordTextBox.getText());
 				}
 			});
 			
@@ -502,8 +507,8 @@ public class UltraGraphicsEngine implements ClickHandler {
 		@Override
 		void setUpFlexTable() {
 			
-			Map<String, List<HumanPlayer>> top10HighScores = ultraGraphicsEngine.getGwtUltra().getHighScores();
-			HumanPlayer humanPlayer = ultraGraphicsEngine.getGwtUltra().getHumanPlayer();
+			Map<String, List<HumanPlayer>> top10HighScores = ultraGraphicsEngine.getUltraController().getHighScores();
+			HumanPlayer humanPlayer = ultraGraphicsEngine.getUltraController().getHumanPlayer();
 			
 			if (top10HighScores != null) {
 				int NORMAL_COLUMN_NAME = 0;

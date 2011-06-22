@@ -1,9 +1,13 @@
 package com.calculatorultra.gwtultra.common;
 
+import java.util.List;
+
+import com.calculatorultra.gwtultra.common.keystrokecontroller.OptionsKeystrokeController;
 import com.calculatorultra.gwtultra.common.keystrokecontroller.PlayerKeystrokeController;
 
 
 public class GwtUltraUtil {
+	public static final int INITIAL_TARGET_MOVES = 5;
 	public static final Vector UP_VECTOR = new Vector(0,-1);
 	public static final Vector DOWN_VECTOR = new Vector(0,1);
 	public static final Vector RIGHT_VECTOR = new Vector(1,0);
@@ -38,7 +42,67 @@ public class GwtUltraUtil {
 	public static final Vector DOWN = new Vector(0,1);
 	public static final Vector LEFT = new Vector(-1,0);
 	public static final Vector RIGHT = new Vector(1,0);
+	
+	public static void newObsticle(Vector position, List<FieldObject> obstacles, UltraController controller) {
+		obstacles.add(new Obstacle(new Vector(position), controller));
+	}
 
+	public static Vector newRandomVector() {
+		return new Vector((int) (Math.random() * WIDTH_SPACES),
+				(int) (Math.random() * HEIGHT_SPACES));
+	}
+
+	public static float calculateAveragePoints(Player player, List<FieldObject> obstacles) {
+		// Determines the Average Point Value (APV) received of each target
+		if (obstacles.size() > 0) { // Prevents Divide by 0!
+			float averagePoints = (float) (player.getScore())/ (obstacles.size());
+			return averagePoints;
+		} else {
+			return 0;
+		}
+	}
+	
+	public static boolean playerIsOutOfBounds(Player player) {
+		if (((player.position.x) < 0)
+			|| ((player.position.x) >= WIDTH_SPACES)
+			|| ((player.position.y) < 0)
+			|| ((player.position.y) >= HEIGHT_SPACES)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static void stopPlayers(Player...players) {
+		for (Player player : players) {
+			player.setDirection(new Vector(0, 0));
+		}
+	}
+	
+	public static void wrapPlayers(Player...players) {
+		for (Player player : players) {
+			if ((player.position.x + player.direction.x) < 0) {
+				player.position.x += WIDTH_SPACES;
+			} else if ((player.position.x + player.direction.x) >= WIDTH_SPACES) {
+				player.position.x -= WIDTH_SPACES;
+			} else if ((player.position.y + player.direction.y) < 0) {
+				player.position.y += HEIGHT_SPACES;
+			} else if ((player.position.y + player.direction.y) >= HEIGHT_SPACES) {
+				player.position.y -= HEIGHT_SPACES;
+			}
+		}
+	}
+	
+
+	public static boolean playerIsMoving(Player...players) {
+		for (Player player : players) {
+			if (player.direction.equals(new Vector(0,0)) == false) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static void setSinglePlayerControls(PlayerKeystrokeController playerKeyController) {
 		playerKeyController.addKeystroke(W, Function.UP);
 		playerKeyController.addKeystroke(UP_ARROW, Function.UP);
@@ -48,6 +112,15 @@ public class GwtUltraUtil {
 		playerKeyController.addKeystroke(UP_ARROW, Function.LEFT);
 		playerKeyController.addKeystroke(D, Function.RIGHT);
 		playerKeyController.addKeystroke(UP_ARROW, Function.RIGHT);
+	}
+	
+	public static void setOptionsControls(OptionsKeystrokeController optionsKeyController) {
+		optionsKeyController.addKeystroke(E, Function.MOVE_TARGET);
+		optionsKeyController.addKeystroke(SLASH, Function.MOVE_TARGET);
+		optionsKeyController.addKeystroke(ZERO, Function.MOVE_TARGET);
+		optionsKeyController.addKeystroke(N, Function.NEW_GAME);
+		optionsKeyController.addKeystroke(SPACE_BAR, Function.NEW_GAME);
+		optionsKeyController.addKeystroke(P, Function.PAUSE);
 	}
 	
 	public static enum Mode {

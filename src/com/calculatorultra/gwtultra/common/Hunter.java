@@ -10,7 +10,6 @@ import com.google.gwt.core.client.GWT;
 
 
 public class Hunter extends MovingFieldObject {
-	private final GwtUltra gwtUltra;
 	private final Player playerTarget;
 	private final Target target;
 	private final ArrayList<Vector> hunterDeadSquares = new ArrayList<Vector>();
@@ -20,7 +19,7 @@ public class Hunter extends MovingFieldObject {
 	public Hunter(Vector startPosition, Player playerTarget, Target target, GwtUltra gwtUltra) {
 		this.position = startPosition;
 		this.graphics = gwtUltra.getGraphicsEngine();
-		this.gwtUltra = gwtUltra;
+		this.ultraController = gwtUltra;
 		this.playerTarget = playerTarget;
 		this.target = target;
 		graphics.addToField(this);
@@ -35,8 +34,8 @@ public class Hunter extends MovingFieldObject {
 	
 	public boolean checkOpen(Vector positionToCheck)
 	{
-		for (Obstacle obstacle : gwtUltra.getObstacles()) {
-			if (positionToCheck.equals(obstacle.position)) {
+		for (FieldObject obstacle : ultraController.getObstacles()) {
+			if (obstacle.getClass().equals(Obstacle.class) && positionToCheck.equals(obstacle.position)) {
 				return false;
 			}
 		}

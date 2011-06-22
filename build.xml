@@ -1,0 +1,114 @@
+<project name="Ultra" default="release">
+
+    <property name="version" value="1.0"/>
+	
+	<property name="ant.build.javac.source" value="1.6" />
+	<property name="ant.build.javac.target" value="1.6" />
+	
+	<property name="javac.compiler.flags" value="-Xlint:all,-serial,-fallthrough"/>
+	<property name="build.output.dir" value="${basedir}/build-output"/>
+	<property name="build.output.private.dir" value="${build.output.dir}/private"/>
+	<property name="build.output.src.dir" value="${build.output.private.dir}/src"/>
+	<property name="build.output.tst.dir" value="${build.output.private.dir}/tst"/>
+	<property name="build.output.lib.dir" value="${build.output.dir}/lib"/>
+	<property name="build.output.war.dir" value="${build.output.private.dir}/war"/>
+	<property name="build.output.war.lib.dir" value="${build.output.war.dir}/WEB-INF/lib"/>
+	<property name="build.output.reports.dir" value="${build.output.dir}/reports"/>
+	<property name="build.output.junit.dir" value="${build.output.reports.dir}/junit"/>
+	<property name="src.dir" value="${basedir}/src"/>
+	<property name="config.dir" value="${basedir}/configuration"/>
+	<property name="tst.dir" value="${basedir}/tst"/>
+	<property name="lib.dir" value="${basedir}/lib"/>
+	<property name="lib.build.dir" value="${lib.dir}/build"/>
+	<property name="lib.run.dir" value="${lib.dir}/run"/>
+	<property name="war.dir" value="${basedir}/war"/>
+	
+	<target name="release" depends="war,javadoc"/>
+	
+	<target name="clean">
+		<delete dir="${build.output.dir}" />
+	</target>
+	
+	<target name="src-compile">
+		<mkdir dir="${build.output.src.dir}" />
+		<path id="src.compile.path">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+		</path>
+		<javac srcdir="${src.dir}"
+		       destdir="${build.output.src.dir}"
+			   classpathref="src.compile.path"
+		       debug="on"
+		/>
+		<copy todir="${build.output.src.dir}" verbose="true">
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="jar" depends="src-compile">
+		<mkdir dir="${build.output.lib.dir}" />
+		<jar destfile="${build.output.lib.dir}/${ant.project.name}.jar"
+		     basedir="${build.output.src.dir}"
+		/>
+	</target>
+	
+	<target name="gwt-compile" depends="src-compile" description="GWT compile to JavaScript">
+		<!-- http://code.google.com/webtoolkit/doc/latest/FAQ_DebuggingAndCompiling.html#What_are_the_options_that_can_be_passed_to_the_compiler -->
+		<java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+			<classpath>
+				<!-- GWT libraries -->
+				<fileset dir="${lib.build.dir}">
+					<include name="*.jar"/>
+				</fileset>
+				<pathelement location="${src.dir}"/>
+				<pathelement location="${build.output.src.dir}"/>
+			</classpath>
+			<jvmarg value="-Xmx512M"/>
+			<arg value="-war"/>
+			<arg value="${build.output.war.dir}"/>
+			<arg value="com.calculatorultra.gwtultra.GwtUltra"/>
+			<!-- add any other entry points here -->
+		</java>
+	</target>
+	
+	<target name="setup-war-directory">
+		<copy todir="${build.output.war.lib.dir}">
+			<fileset dir="${lib.run.dir}" />
+			<fileset dir="${build.output.lib.dir}" />
+			<flattenmapper/>
+		</copy>
+		<copy todir="${build.output.war.dir}">
+			<fileset dir="${war.dir}">
+				<!-- The web.xml file gets included when gerating the war in the "war" target. -->
+				<exclude name="WEB-INF/**"/>
+				<exclude name="gwtultra/**"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="generate-war">
+		<war destfile="${build.output.dir}/${ant.project.name}.war" webxml="${war.dir}/WEB-INF/web.xml">
+			<lib dir="${build.output.war.lib.dir}"/>
+			<fileset dir="${build.output.war.dir}">
+				<exclude name="WEB-INF/lib/**"/>
+			</fileset>
+		</war>
+	</target>
+	
+	<target name="war" depends="jar,gwt-compile,setup-war-directory,generate-war">
+	</target>
+	
+	<target name="javadoc">
+	</target>
+	
+	<macrodef name="echo-classpath">
+        <attribute name="refid" description="Classpath reference id to define"/>
+        <sequential>
+            <pathconvert property="@{refid}.echo" refid="@{refid}" />
+        	<echo message="${@{refid}.echo}"/>
+        </sequential>
+    </macrodef>
+</project>
